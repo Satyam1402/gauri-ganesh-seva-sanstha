@@ -1,0 +1,19 @@
+<x-ui.section background="muted">
+    <div class="grid items-center gap-10 lg:grid-cols-2">
+        <div class="order-2 aspect-[4/3] overflow-hidden rounded-xl bg-surface-white lg:order-1">
+            <x-ui.lazy-image :media="$section->getFirstMedia('image')" :alt="$section->heading" />
+        </div>
+
+        <div class="order-1 lg:order-2">
+            @if ($section->heading)
+                <h2 class="font-display text-3xl font-semibold text-text-900">{{ $section->heading }}</h2>
+            @endif
+            @if ($section->subheading)
+                <p class="mt-3 text-lg text-text-600">{{ $section->subheading }}</p>
+            @endif
+            @if ($section->description)
+                <p class="mt-4 text-text-600">{{ $section->description }}</p>
+            @endif
+        </div>
+    </div>
+</x-ui.section>

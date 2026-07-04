@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+
+/* Class-based dark mode: toggled via a `.dark` class on <html> (see resources/js/app.js). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/fraunces/500.css';
+@import '@fontsource/fraunces/600.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/**
+ * Design tokens below are sourced from docs/UI-UX-BLUEPRINT.md (Sections 2-6).
+ * Any change to the brand palette/typography/spacing scale should be made
+ * there first, then mirrored here — this file is the single implementation
+ * of that design system, not a place to introduce one-off values.
+ */
+@theme {
+    /* Typography (Section 3) */
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
+
+    /* Color: Primary — deep teal-green (Section 2) */
+    --color-primary-100: #DCEEE9;
+    --color-primary-700: #0F5C4E;
+    --color-primary-800: #0B473C;
+    --color-primary-900: #082F28;
+
+    /* Color: Secondary — warm terracotta-brown */
+    --color-secondary-600: #8A5A2B;
+
+    /* Color: Accent — marigold/saffron, reserved for donation CTAs */
+    --color-accent-100: #FDECD3;
+    --color-accent-500: #E8912D;
+
+    /* Color: Background / Surface */
+    --color-bg-base: #FBF9F6;
+    --color-surface-white: #FFFFFF;
+    --color-surface-muted: #F3EFE8;
+
+    /* Color: Text */
+    --color-text-900: #1E2422;
+    --color-text-600: #54615C;
+    --color-text-400: #8B968F;
+    --color-text-inverse: #FFFFFF;
+
+    /* Color: Semantic */
+    --color-success-600: #1E8A5F;
+    --color-warning-600: #C9821A;
+    --color-error-600: #C4442C;
+
+    /* Color: Border */
+    --color-border-subtle: #E4DFD6;
+
+    /* Dark mode surfaces (Admin Panel — "Dark Mode Ready Architecture") */
+    --color-night-bg: #0E1512;
+    --color-night-surface: #16211D;
+    --color-night-surface-alt: #1C2925;
+    --color-night-border: #2A3833;
+    --color-night-text: #EDF2EF;
+    --color-night-text-muted: #9FB0A8;
+
+    /* Border Radius (Section 5) — overrides Tailwind's default scale */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    /* Shadows (Section 6) — warm-toned, low-opacity, elevation-only */
+    --shadow-xs: 0 1px 2px rgba(30, 36, 34, 0.04);
+    --shadow-sm: 0 2px 6px rgba(30, 36, 34, 0.06);
+    --shadow-md: 0 8px 20px rgba(30, 36, 34, 0.08);
+    --shadow-lg: 0 16px 40px rgba(30, 36, 34, 0.12);
+}
+
+@layer base {
+    body {
+        @apply bg-bg-base text-text-900 font-sans antialiased dark:bg-night-bg dark:text-night-text;
+    }
+
+    h1, h2, h3, h4 {
+        @apply font-display font-semibold text-text-900 leading-tight dark:text-night-text;
+    }
+
+    :focus-visible {
+        @apply outline-none ring-3 ring-primary-700/35;
+    }
+}
