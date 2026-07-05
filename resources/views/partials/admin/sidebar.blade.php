@@ -24,12 +24,22 @@
 
         <div>
             <p class="px-2 text-xs font-semibold uppercase tracking-wide text-text-400 dark:text-night-text-muted">Fundraising</p>
-            <span class="{{ $comingSoon }}" title="Coming soon">Campaigns</span>
-            <span class="{{ $comingSoon }}" title="Coming soon">Donations</span>
+            @can('viewAny', App\Models\DonationCampaign::class)
+                <a href="{{ route('admin.donation-campaigns.index') }}" class="{{ $navLink('admin.donation-campaigns.index', 'admin.donation-campaigns.*') }}">Campaigns</a>
+            @endcan
+            @can('viewAny', App\Models\Donation::class)
+                <a href="{{ route('admin.donations.index') }}" class="{{ $navLink('admin.donations.index', 'admin.donations.*') }}">Donations</a>
+            @endcan
+            @can('viewReports', App\Models\Donation::class)
+                <a href="{{ route('admin.donation-reports.index') }}" class="{{ $navLink('admin.donation-reports.index', 'admin.donation-reports.*') }}">Reports</a>
+            @endcan
         </div>
 
         <div>
             <p class="px-2 text-xs font-semibold uppercase tracking-wide text-text-400 dark:text-night-text-muted">Engagement</p>
+            @can('viewAny', App\Models\EventRegistration::class)
+                <a href="{{ route('admin.event-registrations.index') }}" class="{{ $navLink('admin.event-registrations.index', 'admin.event-registrations.*') }}">Event Registrations</a>
+            @endcan
             <span class="{{ $comingSoon }}" title="Coming soon">Volunteers</span>
             <span class="{{ $comingSoon }}" title="Coming soon">Help Requests</span>
             <span class="{{ $comingSoon }}" title="Coming soon">Testimonials</span>
@@ -43,8 +53,16 @@
             @can('viewAny', App\Models\AboutSection::class)
                 <a href="{{ route('admin.about-sections.index') }}" class="{{ $navLink('admin.about-sections.index', 'admin.about-sections.*') }}">About Us</a>
             @endcan
+            @can('viewAny', App\Models\Activity::class)
+                <a href="{{ route('admin.activities.index') }}" class="{{ $navLink('admin.activities.index', 'admin.activities.*') }}">Activities</a>
+            @endcan
+            @can('viewAny', App\Models\Event::class)
+                <a href="{{ route('admin.events.index') }}" class="{{ $navLink('admin.events.index', 'admin.events.*') }}">Events</a>
+            @endcan
             <span class="{{ $comingSoon }}" title="Coming soon">Blog</span>
-            <span class="{{ $comingSoon }}" title="Coming soon">Gallery</span>
+            @can('viewAny', App\Models\GalleryAlbum::class)
+                <a href="{{ route('admin.gallery-albums.index') }}" class="{{ $navLink('admin.gallery-albums.index', 'admin.gallery-*') }}">Gallery</a>
+            @endcan
             <span class="{{ $comingSoon }}" title="Coming soon">Team</span>
         </div>
 

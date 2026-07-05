@@ -21,6 +21,13 @@ class DatabaseSeeder extends Seeder
             HomeSectionsSeeder::class,
             OrgProfileSeeder::class,
             AboutSectionsSeeder::class,
+            ActivityCategoriesSeeder::class,
+            ActivitiesSeeder::class,
+            DonationCampaignsSeeder::class,
+            GalleryCategoriesSeeder::class,
+            GalleryAlbumsSeeder::class,
+            EventCategoriesSeeder::class,
+            EventsSeeder::class,
         ]);
     }
 }
