@@ -10,7 +10,7 @@
             <a href="#" class="hover:text-primary-700">Programs</a>
             <a href="#" class="hover:text-primary-700">Campaigns</a>
             <a href="#" class="hover:text-primary-700">Gallery</a>
-            <a href="#" class="hover:text-primary-700">Blog</a>
+            <a href="{{ route('blog.index') }}" class="hover:text-primary-700">Blog</a>
             <a href="#" class="hover:text-primary-700">Contact</a>
         </nav>
 
@@ -42,7 +42,7 @@
             <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Programs</a>
             <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Campaigns</a>
             <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Gallery</a>
-            <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Blog</a>
+            <a href="{{ route('blog.index') }}" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Blog</a>
             <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Contact</a>
             <x-ui.button href="#" variant="accent" size="md" class="mt-3 justify-center">Donate Now</x-ui.button>
         </nav>

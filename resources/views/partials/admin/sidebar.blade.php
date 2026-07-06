@@ -59,7 +59,9 @@
             @can('viewAny', App\Models\Event::class)
                 <a href="{{ route('admin.events.index') }}" class="{{ $navLink('admin.events.index', 'admin.events.*') }}">Events</a>
             @endcan
-            <span class="{{ $comingSoon }}" title="Coming soon">Blog</span>
+            @can('viewAny', App\Models\BlogPost::class)
+                <a href="{{ route('admin.blog-posts.index') }}" class="{{ $navLink('admin.blog-posts.index', 'admin.blog-*') }}">Blog</a>
+            @endcan
             @can('viewAny', App\Models\GalleryAlbum::class)
                 <a href="{{ route('admin.gallery-albums.index') }}" class="{{ $navLink('admin.gallery-albums.index', 'admin.gallery-*') }}">Gallery</a>
             @endcan

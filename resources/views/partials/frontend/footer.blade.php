@@ -14,7 +14,7 @@
                 <a href="{{ route('about') }}" class="hover:text-white">About</a>
                 <a href="#" class="hover:text-white">Programs</a>
                 <a href="#" class="hover:text-white">Campaigns</a>
-                <a href="#" class="hover:text-white">Blog</a>
+                <a href="{{ route('blog.index') }}" class="hover:text-white">Blog</a>
             </nav>
         </div>
 

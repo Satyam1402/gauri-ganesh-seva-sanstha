@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             GalleryAlbumsSeeder::class,
             EventCategoriesSeeder::class,
             EventsSeeder::class,
+            BlogCategoriesSeeder::class,
+            BlogPostsSeeder::class,
         ]);
     }
 }
