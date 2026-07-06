@@ -81,6 +81,31 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 4.5 19 19.5M19 4.5 5 19.5" />
             @break
 
+        @case('instagram')
+            <rect x="4" y="4" width="16" height="16" rx="4" />
+            <circle cx="12" cy="12" r="3.5" />
+            <circle cx="16.75" cy="7.25" r="0.75" fill="currentColor" />
+            @break
+
+        @case('youtube')
+            <rect x="3" y="6" width="18" height="12" rx="3" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 9.5v5l4.5-2.5-4.5-2.5Z" />
+            @break
+
+        @case('linkedin')
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+            <path stroke-linecap="round" d="M8 11v5M8 8.2v.05M12 16v-3a2 2 0 0 1 4 0v3" />
+            @break
+
+        @case('phone')
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 4.5h3l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5C10.2 19.9 4.1 13.8 3.5 6.1A1.5 1.5 0 0 1 5 4.5Z" />
+            @break
+
+        @case('envelope')
+            <rect x="3.5" y="5.5" width="17" height="13" rx="1.5" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 7 7.5 6 7.5-6" />
+            @break
+
         @case('check')
             <path stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7" />
             @break

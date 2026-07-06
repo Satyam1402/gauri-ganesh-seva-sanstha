@@ -30,6 +30,8 @@ class DatabaseSeeder extends Seeder
             EventsSeeder::class,
             BlogCategoriesSeeder::class,
             BlogPostsSeeder::class,
+            VolunteerApplicationsSeeder::class,
+            ContactEnquiriesSeeder::class,
         ]);
     }
 }

@@ -33,6 +33,43 @@
         </x-ui.card>
 
         <x-ui.card class="max-w-3xl">
+            <h3 class="font-display text-lg font-semibold text-text-900 dark:text-night-text">Contact Information</h3>
+            <p class="mt-1 text-sm text-text-600 dark:text-night-text-muted">Shown on the public Contact page (address, phones, emails, office hours, map).</p>
+
+            <div class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <x-ui.input label="Street Address" name="address_line" value="{{ old('address_line', $profile->address_line) }}" :error="$errors->first('address_line')" />
+                </div>
+                <x-ui.input label="City" name="city" value="{{ old('city', $profile->city) }}" :error="$errors->first('city')" />
+                <x-ui.input label="State" name="state" value="{{ old('state', $profile->state) }}" :error="$errors->first('state')" />
+                <x-ui.input label="PIN Code" name="pin_code" value="{{ old('pin_code', $profile->pin_code) }}" :error="$errors->first('pin_code')" />
+                <x-ui.input label="Office Hours" name="office_hours" value="{{ old('office_hours', $profile->office_hours) }}" placeholder="e.g. Mon–Sat, 9:00 AM – 6:00 PM" :error="$errors->first('office_hours')" />
+                <x-ui.input label="Primary Phone" name="phone_primary" value="{{ old('phone_primary', $profile->phone_primary) }}" :error="$errors->first('phone_primary')" />
+                <x-ui.input label="Secondary Phone" name="phone_secondary" value="{{ old('phone_secondary', $profile->phone_secondary) }}" :error="$errors->first('phone_secondary')" />
+                <x-ui.input label="Primary Email" name="email_primary" type="email" value="{{ old('email_primary', $profile->email_primary) }}" :error="$errors->first('email_primary')" />
+                <x-ui.input label="Secondary Email" name="email_secondary" type="email" value="{{ old('email_secondary', $profile->email_secondary) }}" :error="$errors->first('email_secondary')" />
+                <x-ui.input label="WhatsApp Number" name="whatsapp_number" value="{{ old('whatsapp_number', $profile->whatsapp_number) }}" helper="With country code, e.g. +91 98765 43210" :error="$errors->first('whatsapp_number')" />
+                <x-ui.input label="Emergency Helpline (optional)" name="emergency_phone" value="{{ old('emergency_phone', $profile->emergency_phone) }}" :error="$errors->first('emergency_phone')" />
+                <div class="sm:col-span-2">
+                    <x-ui.input label="Google Maps Embed URL" name="map_embed_url" value="{{ old('map_embed_url', $profile->map_embed_url) }}" helper="Google Maps → Share → Embed a map → copy the src URL (contains /maps/embed)." :error="$errors->first('map_embed_url')" />
+                </div>
+            </div>
+        </x-ui.card>
+
+        <x-ui.card class="max-w-3xl">
+            <h3 class="font-display text-lg font-semibold text-text-900 dark:text-night-text">Social Media Links</h3>
+            <p class="mt-1 text-sm text-text-600 dark:text-night-text-muted">Leave a field empty to hide that platform on the website.</p>
+
+            <div class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <x-ui.input label="Facebook" name="facebook_url" value="{{ old('facebook_url', $profile->facebook_url) }}" :error="$errors->first('facebook_url')" />
+                <x-ui.input label="Instagram" name="instagram_url" value="{{ old('instagram_url', $profile->instagram_url) }}" :error="$errors->first('instagram_url')" />
+                <x-ui.input label="X / Twitter" name="twitter_url" value="{{ old('twitter_url', $profile->twitter_url) }}" :error="$errors->first('twitter_url')" />
+                <x-ui.input label="YouTube" name="youtube_url" value="{{ old('youtube_url', $profile->youtube_url) }}" :error="$errors->first('youtube_url')" />
+                <x-ui.input label="LinkedIn" name="linkedin_url" value="{{ old('linkedin_url', $profile->linkedin_url) }}" :error="$errors->first('linkedin_url')" />
+            </div>
+        </x-ui.card>
+
+        <x-ui.card class="max-w-3xl">
             <h3 class="font-display text-lg font-semibold text-text-900 dark:text-night-text">Trust Certificates</h3>
             <p class="mt-1 text-sm text-text-600 dark:text-night-text-muted">Shown as a gallery on the Trust Certificates section (images or PDFs).</p>
 

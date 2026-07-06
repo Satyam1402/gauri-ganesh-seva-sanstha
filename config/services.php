@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Google reCAPTCHA v2 for public forms. Leave both keys empty to run
+    // without reCAPTCHA — the Recaptcha rule and widget become no-ops.
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
 ];

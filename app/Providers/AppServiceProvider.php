@@ -8,6 +8,7 @@ use App\Interfaces\ActivityRepositoryInterface;
 use App\Interfaces\BlogCategoryRepositoryInterface;
 use App\Interfaces\BlogCommentRepositoryInterface;
 use App\Interfaces\BlogPostRepositoryInterface;
+use App\Interfaces\ContactEnquiryRepositoryInterface;
 use App\Interfaces\DonationCampaignRepositoryInterface;
 use App\Interfaces\DonationRepositoryInterface;
 use App\Interfaces\EventCategoryRepositoryInterface;
@@ -17,6 +18,7 @@ use App\Interfaces\GalleryAlbumRepositoryInterface;
 use App\Interfaces\GalleryCategoryRepositoryInterface;
 use App\Interfaces\HomeSectionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
+use App\Interfaces\VolunteerApplicationRepositoryInterface;
 use App\Models\User;
 use App\Policies\RolePolicy;
 use App\Repositories\AboutSectionRepository;
@@ -25,6 +27,7 @@ use App\Repositories\ActivityRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogCommentRepository;
 use App\Repositories\BlogPostRepository;
+use App\Repositories\ContactEnquiryRepository;
 use App\Repositories\DonationCampaignRepository;
 use App\Repositories\DonationRepository;
 use App\Repositories\EventCategoryRepository;
@@ -34,6 +37,7 @@ use App\Repositories\GalleryAlbumRepository;
 use App\Repositories\GalleryCategoryRepository;
 use App\Repositories\HomeSectionRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\VolunteerApplicationRepository;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -61,6 +65,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BlogCategoryRepositoryInterface::class, BlogCategoryRepository::class);
         $this->app->bind(BlogPostRepositoryInterface::class, BlogPostRepository::class);
         $this->app->bind(BlogCommentRepositoryInterface::class, BlogCommentRepository::class);
+        $this->app->bind(VolunteerApplicationRepositoryInterface::class, VolunteerApplicationRepository::class);
+        $this->app->bind(ContactEnquiryRepositoryInterface::class, ContactEnquiryRepository::class);
     }
 
     /**

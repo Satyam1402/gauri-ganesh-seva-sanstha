@@ -40,7 +40,12 @@
             @can('viewAny', App\Models\EventRegistration::class)
                 <a href="{{ route('admin.event-registrations.index') }}" class="{{ $navLink('admin.event-registrations.index', 'admin.event-registrations.*') }}">Event Registrations</a>
             @endcan
-            <span class="{{ $comingSoon }}" title="Coming soon">Volunteers</span>
+            @can('viewAny', App\Models\VolunteerApplication::class)
+                <a href="{{ route('admin.volunteer-applications.index') }}" class="{{ $navLink('admin.volunteer-applications.index', 'admin.volunteer-applications.*') }}">Volunteers</a>
+            @endcan
+            @can('viewAny', App\Models\ContactEnquiry::class)
+                <a href="{{ route('admin.contact-enquiries.index') }}" class="{{ $navLink('admin.contact-enquiries.index', 'admin.contact-enquiries.*') }}">Enquiries</a>
+            @endcan
             <span class="{{ $comingSoon }}" title="Coming soon">Help Requests</span>
             <span class="{{ $comingSoon }}" title="Coming soon">Testimonials</span>
         </div>

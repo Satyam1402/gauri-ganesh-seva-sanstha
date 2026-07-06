@@ -27,6 +27,36 @@ class PagesSeeder extends Seeder
             ]);
         }
 
+        $volunteer = Page::updateOrCreate(['slug' => 'volunteer'], ['title' => 'Become a Volunteer']);
+
+        if ($volunteer->seo === null) {
+            $volunteer->seo()->create([
+                'meta_title' => 'Become a Volunteer — Gauri Ganesh Seva Sanstha',
+                'meta_description' => 'Join Gauri Ganesh Seva Sanstha as a volunteer. Help with food distribution, education, medical camps, and community outreach. Apply online in minutes.',
+                'meta_keywords' => 'volunteer, NGO volunteering, seva, Pune, apply volunteer, community service',
+                'canonical_url' => url('/volunteer'),
+                'og_title' => 'Become a Volunteer',
+                'og_description' => 'Lend your time and skills — help us restore dignity in the communities we serve.',
+                'twitter_card' => 'summary_large_image',
+                'schema_type' => 'WebPage',
+            ]);
+        }
+
+        $contact = Page::updateOrCreate(['slug' => 'contact'], ['title' => 'Contact Us']);
+
+        if ($contact->seo === null) {
+            $contact->seo()->create([
+                'meta_title' => 'Contact Us — Gauri Ganesh Seva Sanstha',
+                'meta_description' => 'Reach Gauri Ganesh Seva Sanstha by phone, email, WhatsApp, or our enquiry form — for donations, volunteering, partnerships, media, and general questions.',
+                'meta_keywords' => 'contact, NGO, enquiry, Pune, donation help, volunteer contact, partnership',
+                'canonical_url' => url('/contact'),
+                'og_title' => 'Contact Gauri Ganesh Seva Sanstha',
+                'og_description' => 'Questions about donations, volunteering, or partnerships? We usually respond within 2–3 working days.',
+                'twitter_card' => 'summary_large_image',
+                'schema_type' => 'ContactPage',
+            ]);
+        }
+
         $about = Page::updateOrCreate(['slug' => 'about'], ['title' => 'About Us']);
 
         if ($about->seo === null) {

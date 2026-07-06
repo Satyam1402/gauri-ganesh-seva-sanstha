@@ -11,11 +11,11 @@
             <a href="#" class="hover:text-primary-700">Campaigns</a>
             <a href="#" class="hover:text-primary-700">Gallery</a>
             <a href="{{ route('blog.index') }}" class="hover:text-primary-700">Blog</a>
-            <a href="#" class="hover:text-primary-700">Contact</a>
+            <a href="{{ route('contact') }}" class="hover:text-primary-700">Contact</a>
         </nav>
 
         <div class="hidden items-center gap-3 lg:flex">
-            <x-ui.button href="#" variant="ghost" size="sm">Get Involved</x-ui.button>
+            <x-ui.button href="{{ route('volunteer.create') }}" variant="ghost" size="sm">Get Involved</x-ui.button>
             <x-ui.button href="#" variant="accent" size="sm">Donate Now</x-ui.button>
         </div>
 
@@ -43,7 +43,8 @@
             <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Campaigns</a>
             <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Gallery</a>
             <a href="{{ route('blog.index') }}" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Blog</a>
-            <a href="#" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Contact</a>
+            <a href="{{ route('volunteer.create') }}" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Volunteer</a>
+            <a href="{{ route('contact') }}" class="rounded-md px-3 py-2 hover:bg-surface-muted hover:text-primary-700">Contact</a>
             <x-ui.button href="#" variant="accent" size="md" class="mt-3 justify-center">Donate Now</x-ui.button>
         </nav>
     </div>

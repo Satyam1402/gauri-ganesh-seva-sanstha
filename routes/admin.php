@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogCommentController;
 use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\ContactEnquiryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DonationCampaignController;
 use App\Http\Controllers\Admin\DonationController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VolunteerApplicationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -134,6 +136,41 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('event-registrations', [EventRegistrationController::class, 'index'])->name('event-registrations.index');
         Route::put('event-registrations/{event_registration}', [EventRegistrationController::class, 'update'])->name('event-registrations.update');
         Route::delete('event-registrations/{event_registration}', [EventRegistrationController::class, 'destroy'])->name('event-registrations.destroy');
+    });
+
+    Route::middleware('permission:manage contact messages')->group(function () {
+        // Registered before the wildcard routes so "export" and the bulk
+        // endpoints are never captured by {contact_enquiry}.
+        Route::get('contact-enquiries/export', [ContactEnquiryController::class, 'export'])->name('contact-enquiries.export');
+        Route::post('contact-enquiries/bulk-status', [ContactEnquiryController::class, 'bulkUpdateStatus'])->name('contact-enquiries.bulk-status');
+        Route::post('contact-enquiries/bulk-delete', [ContactEnquiryController::class, 'bulkDestroy'])->name('contact-enquiries.bulk-delete');
+
+        Route::get('contact-enquiries', [ContactEnquiryController::class, 'index'])->name('contact-enquiries.index');
+        Route::get('contact-enquiries/{contact_enquiry}', [ContactEnquiryController::class, 'show'])->name('contact-enquiries.show')->withTrashed();
+        Route::put('contact-enquiries/{contact_enquiry}', [ContactEnquiryController::class, 'update'])->name('contact-enquiries.update');
+        Route::post('contact-enquiries/{contact_enquiry}/reply', [ContactEnquiryController::class, 'reply'])->name('contact-enquiries.reply');
+        Route::patch('contact-enquiries/{contact_enquiry}/restore', [ContactEnquiryController::class, 'restore'])->name('contact-enquiries.restore')->withTrashed();
+        Route::delete('contact-enquiries/{contact_enquiry}', [ContactEnquiryController::class, 'destroy'])->name('contact-enquiries.destroy');
+        Route::get('contact-enquiries/{contact_enquiry}/attachment', [ContactEnquiryController::class, 'downloadAttachment'])->name('contact-enquiries.attachment');
+    });
+
+    Route::middleware('permission:manage volunteers')->group(function () {
+        // Registered before the wildcard routes so "export" and the bulk
+        // endpoints are never captured by {volunteer_application}.
+        Route::get('volunteer-applications/export', [VolunteerApplicationController::class, 'export'])->name('volunteer-applications.export');
+        Route::post('volunteer-applications/bulk-status', [VolunteerApplicationController::class, 'bulkUpdateStatus'])->name('volunteer-applications.bulk-status');
+        Route::post('volunteer-applications/bulk-delete', [VolunteerApplicationController::class, 'bulkDestroy'])->name('volunteer-applications.bulk-delete');
+
+        Route::get('volunteer-applications', [VolunteerApplicationController::class, 'index'])->name('volunteer-applications.index');
+        Route::get('volunteer-applications/{volunteer_application}', [VolunteerApplicationController::class, 'show'])->name('volunteer-applications.show')->withTrashed();
+        Route::put('volunteer-applications/{volunteer_application}', [VolunteerApplicationController::class, 'update'])->name('volunteer-applications.update');
+        Route::patch('volunteer-applications/{volunteer_application}/approve', [VolunteerApplicationController::class, 'approve'])->name('volunteer-applications.approve');
+        Route::patch('volunteer-applications/{volunteer_application}/reject', [VolunteerApplicationController::class, 'reject'])->name('volunteer-applications.reject');
+        Route::patch('volunteer-applications/{volunteer_application}/hold', [VolunteerApplicationController::class, 'hold'])->name('volunteer-applications.hold');
+        Route::patch('volunteer-applications/{volunteer_application}/archive', [VolunteerApplicationController::class, 'archive'])->name('volunteer-applications.archive');
+        Route::patch('volunteer-applications/{volunteer_application}/restore', [VolunteerApplicationController::class, 'restore'])->name('volunteer-applications.restore')->withTrashed();
+        Route::delete('volunteer-applications/{volunteer_application}', [VolunteerApplicationController::class, 'destroy'])->name('volunteer-applications.destroy');
+        Route::get('volunteer-applications/{volunteer_application}/documents/{collection}', [VolunteerApplicationController::class, 'downloadDocument'])->name('volunteer-applications.document');
     });
 
     Route::middleware('permission:manage gallery')->group(function () {

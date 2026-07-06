@@ -3,11 +3,13 @@
 use App\Http\Controllers\Frontend\AboutController;
 use App\Http\Controllers\Frontend\ActivityController;
 use App\Http\Controllers\Frontend\BlogController;
+use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\DonationCampaignController;
 use App\Http\Controllers\Frontend\DonationController;
 use App\Http\Controllers\Frontend\EventController;
 use App\Http\Controllers\Frontend\GalleryController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\VolunteerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -42,6 +44,19 @@ Route::get('/donation/{donation:reference}/pay', [DonationController::class, 'pa
 Route::post('/donation/{donation:reference}/callback/{gateway}', [DonationController::class, 'callback'])->name('donations.callback');
 Route::get('/donation/{donation:reference}/success', [DonationController::class, 'success'])->name('donations.success');
 Route::get('/donation/{donation:reference}/failed', [DonationController::class, 'failed'])->name('donations.failed');
+
+// Volunteer thank-you sits above the form routes for readability; the store
+// endpoint is throttled tighter than other forms since it accepts uploads.
+Route::get('/volunteer', [VolunteerController::class, 'create'])->name('volunteer.create');
+Route::post('/volunteer', [VolunteerController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('volunteer.store');
+Route::get('/volunteer/thank-you', [VolunteerController::class, 'thankYou'])->name('volunteer.thank-you');
+
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
