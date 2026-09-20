@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\Cache;
 
 class GalleryAlbumService
 {
-    public function __construct(private GalleryAlbumRepositoryInterface $albums) {}
+    public function __construct(
+        private GalleryAlbumRepositoryInterface $albums,
+        private SeoService $seoService,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data
@@ -122,31 +125,13 @@ class GalleryAlbumService
     }
 
     /**
+     * SEO fields are persisted by the shared SeoService (one write path
+     * for every content type).
+     *
      * @param  array<string, mixed>  $data
      */
     private function syncSeo(GalleryAlbum $album, array $data): void
     {
-        $seo = $album->seo()->firstOrNew();
-
-        $seo->fill([
-            'meta_title' => $data['meta_title'] ?? null,
-            'meta_description' => $data['meta_description'] ?? null,
-            'meta_keywords' => $data['meta_keywords'] ?? null,
-            'canonical_url' => $data['canonical_url'] ?? null,
-            'og_title' => $data['og_title'] ?? null,
-            'og_description' => $data['og_description'] ?? null,
-            'twitter_card' => $data['twitter_card'] ?? 'summary_large_image',
-            'schema_type' => $data['schema_type'] ?? 'ImageGallery',
-        ]);
-
-        if ($data['og_image'] ?? null instanceof UploadedFile) {
-            $media = $album->addMedia($data['og_image'])->toMediaCollection('og_image');
-            $seo->og_image_media_id = $media->id;
-        } elseif (! empty($data['remove_og_image'])) {
-            $album->clearMediaCollection('og_image');
-            $seo->og_image_media_id = null;
-        }
-
-        $album->seo()->save($seo);
+        $this->seoService->sync($album, $data + ['schema_type' => 'ImageGallery']);
     }
 }

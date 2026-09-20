@@ -6,9 +6,9 @@ use App\Enums\EnquiryCategory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Frontend\StoreContactEnquiryRequest;
 use App\Models\OrgProfile;
-use App\Models\Page;
 use App\Services\ContactEnquiryService;
 use App\Services\OrgProfileService;
+use App\Support\Seo\StructuredData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
@@ -24,19 +24,19 @@ class ContactController extends Controller
      */
     public function index(): View
     {
-        $page = Cache::rememberForever('pages.contact', fn () => Page::query()
-            ->where('slug', 'contact')
-            ->with(['seo.ogImage', 'media'])
-            ->first()
-        );
-
         $orgProfile = Cache::rememberForever(OrgProfileService::CACHE_KEY, fn () => OrgProfile::query()
             ->with('media')
             ->first()
         );
 
         return view('frontend.contact.index', [
-            'page' => $page,
+            'seo' => $this->seo()->forPage('contact', [
+                'title' => 'Contact Us',
+                'description' => 'Reach '.setting('general.site_name').' by phone, email, WhatsApp or the enquiry form — for donations, volunteering, partnerships and general questions.',
+                'canonical' => route('contact'),
+                'breadcrumbs' => [['label' => 'Home', 'url' => route('home')], ['label' => 'Contact Us']],
+                'schemas' => [StructuredData::webPage('ContactPage', 'Contact Us', route('contact')), StructuredData::organization()],
+            ]),
             'orgProfile' => $orgProfile,
             'categories' => EnquiryCategory::options(),
             'recaptchaSiteKey' => config('services.recaptcha.site_key'),

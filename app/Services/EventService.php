@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\Cache;
 
 class EventService
 {
-    public function __construct(private EventRepositoryInterface $events) {}
+    public function __construct(
+        private EventRepositoryInterface $events,
+        private SeoService $seoService,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data
@@ -182,31 +185,13 @@ class EventService
     }
 
     /**
+     * SEO fields are persisted by the shared SeoService (one write path
+     * for every content type).
+     *
      * @param  array<string, mixed>  $data
      */
     private function syncSeo(Event $event, array $data): void
     {
-        $seo = $event->seo()->firstOrNew();
-
-        $seo->fill([
-            'meta_title' => $data['meta_title'] ?? null,
-            'meta_description' => $data['meta_description'] ?? null,
-            'meta_keywords' => $data['meta_keywords'] ?? null,
-            'canonical_url' => $data['canonical_url'] ?? null,
-            'og_title' => $data['og_title'] ?? null,
-            'og_description' => $data['og_description'] ?? null,
-            'twitter_card' => $data['twitter_card'] ?? 'summary_large_image',
-            'schema_type' => $data['schema_type'] ?? 'Event',
-        ]);
-
-        if ($data['og_image'] ?? null instanceof UploadedFile) {
-            $media = $event->addMedia($data['og_image'])->toMediaCollection('og_image');
-            $seo->og_image_media_id = $media->id;
-        } elseif (! empty($data['remove_og_image'])) {
-            $event->clearMediaCollection('og_image');
-            $seo->og_image_media_id = null;
-        }
-
-        $event->seo()->save($seo);
+        $this->seoService->sync($event, $data + ['schema_type' => 'Event']);
     }
 }

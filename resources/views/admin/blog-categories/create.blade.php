@@ -12,7 +12,7 @@
 @endsection
 
 @section('content')
-    <x-ui.card class="max-w-xl">
+    <x-ui.card class="max-w-4xl">
         <form method="POST" action="{{ route('admin.blog-categories.store') }}" class="space-y-5">
             @csrf
 
@@ -31,6 +31,8 @@
                 <input type="checkbox" name="is_active" value="1" @checked(old('is_active', true)) class="rounded border-border-subtle text-primary-700 focus:ring-3 focus:ring-primary-700/35">
                 Active
             </label>
+
+            @include('admin.partials.seo-fields', ['seo' => null, 'model' => null, 'previewTitle' => old('name', 'Category'), 'previewDescription' => old('description', ''), 'previewUrl' => url('/blog/category/…'), 'schemaHint' => 'CollectionPage + BreadcrumbList'])
 
             <div class="flex gap-3">
                 <x-ui.button type="submit">Create Category</x-ui.button>

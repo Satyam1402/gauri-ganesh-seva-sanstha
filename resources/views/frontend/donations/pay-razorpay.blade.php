@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Complete Your Payment — '.config('app.name'))
-@section('meta_description', 'Secure payment for your donation to '.config('app.name').'.')
-
 @section('content')
     <x-ui.section background="base">
         <div class="mx-auto max-w-lg">

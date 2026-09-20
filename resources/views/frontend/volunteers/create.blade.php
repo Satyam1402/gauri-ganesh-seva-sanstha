@@ -1,61 +1,9 @@
 @extends('layouts.app')
 
-@php
-    $seo = $page?->seo;
-    $pageUrl = route('volunteer.create');
-    // SEO fallback chains deliberately end in string literals — an inline
-    // @section with a null value leaks an unclosed output buffer.
-    $metaDescription = $seo?->meta_description
-        ?? 'Become a volunteer with '.config('app.name').' — join our food distribution drives, education programmes, and medical camps. Apply online today.';
-@endphp
-
-@section('title', $seo?->meta_title ?? 'Become a Volunteer — '.config('app.name'))
-@section('meta_description', $metaDescription)
-@if ($seo?->meta_keywords)
-    @section('meta_keywords', $seo->meta_keywords)
-@endif
-@section('canonical_url', $seo?->canonical_url ?? $pageUrl)
-@section('og_title', $seo?->og_title ?? 'Become a Volunteer')
-@section('og_description', $seo?->og_description ?? $metaDescription)
-@if ($seo?->ogImage)
-    @section('og_image', $seo->ogImage->getUrl())
-@endif
-@section('twitter_card', $seo?->twitter_card ?? 'summary_large_image')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => $seo?->schema_type ?? 'WebPage',
-            'name' => $seo?->meta_title ?? 'Become a Volunteer',
-            'description' => $metaDescription,
-            'url' => $pageUrl,
-            'isPartOf' => [
-                '@type' => 'WebSite',
-                'name' => config('app.name'),
-                'url' => url('/'),
-            ],
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => 'BreadcrumbList',
-            'itemListElement' => [
-                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
-                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Become a Volunteer', 'item' => $pageUrl],
-            ],
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
 @section('content')
     {{-- Hero --}}
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Become a Volunteer'],
-        ]" class="mb-6" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-6" />
 
         <div class="mx-auto max-w-3xl text-center">
             <p class="text-sm font-semibold uppercase tracking-wide text-accent-500">Join Our Mission</p>
@@ -338,4 +286,6 @@
             </fieldset>
         </form>
     </x-ui.section>
+
+    <x-faq-section heading="Volunteering Questions" subheading="What to expect before you apply." category="volunteers" :limit="6" background="muted" />
 @endsection

@@ -12,7 +12,7 @@
 @endsection
 
 @section('content')
-    <x-ui.card class="max-w-xl">
+    <x-ui.card class="max-w-4xl">
         <form method="POST" action="{{ route('admin.blog-categories.update', $category) }}" class="space-y-5">
             @csrf
             @method('PUT')
@@ -32,6 +32,8 @@
                 <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $category->is_active)) class="rounded border-border-subtle text-primary-700 focus:ring-3 focus:ring-primary-700/35">
                 Active
             </label>
+
+            @include('admin.partials.seo-fields', ['seo' => $category->seo, 'model' => $category, 'previewTitle' => old('name', $category->name), 'previewDescription' => old('description', $category->description ?? ''), 'previewUrl' => route('blog.category', $category), 'schemaHint' => 'CollectionPage + BreadcrumbList'])
 
             <div class="flex gap-3">
                 <x-ui.button type="submit">Save Changes</x-ui.button>

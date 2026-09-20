@@ -31,6 +31,9 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::ManageReports,
             PermissionEnum::ManageSettings,
             PermissionEnum::ManageContactMessages,
+            PermissionEnum::ManageTestimonials,
+            PermissionEnum::ManageFaqs,
+            PermissionEnum::ManagePartners,
         ],
         RoleEnum::ContentManager->value => [
             PermissionEnum::ManageHomepage,
@@ -39,13 +42,15 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::ManageGallery,
             PermissionEnum::ManageBlog,
             PermissionEnum::ManageEvents,
+            PermissionEnum::ManageTestimonials,
+            PermissionEnum::ManageFaqs,
+            PermissionEnum::ManagePartners,
         ],
         RoleEnum::VolunteerManager->value => [
             PermissionEnum::ManageVolunteers,
         ],
         RoleEnum::DonationManager->value => [
             PermissionEnum::ManageDonations,
-            PermissionEnum::ManageReports,
         ],
         RoleEnum::Editor->value => [
             PermissionEnum::ManageBlog,

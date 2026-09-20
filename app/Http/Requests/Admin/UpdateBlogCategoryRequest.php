@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\HasSeoRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateBlogCategoryRequest extends FormRequest
 {
+    use HasSeoRules;
+
     public function authorize(): bool
     {
         return true;
@@ -22,6 +25,7 @@ class UpdateBlogCategoryRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:120', Rule::unique('blog_categories', 'slug')->ignore($this->route('blog_category'))],
             'description' => ['nullable', 'string', 'max:1000'],
             'is_active' => ['nullable', 'boolean'],
+            ...$this->seoRules(),
         ];
     }
 }

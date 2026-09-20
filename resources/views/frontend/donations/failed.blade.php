@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Donation Not Completed — '.config('app.name'))
-@section('meta_description', 'Your donation payment could not be completed. You can try again at any time.')
-
 @section('content')
     <x-ui.section background="base">
         <div class="mx-auto max-w-xl">

@@ -113,6 +113,7 @@ class DonationCampaign extends Model implements HasMedia
     {
         $this->addMediaCollection('featured_image')->singleFile();
         $this->addMediaCollection('og_image')->singleFile();
+        $this->addMediaCollection('twitter_image')->singleFile();
     }
 
     /**

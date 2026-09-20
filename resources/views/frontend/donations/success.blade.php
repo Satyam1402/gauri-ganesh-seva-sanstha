@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Thank You for Your Donation — '.config('app.name'))
-@section('meta_description', 'Your donation to '.config('app.name').' was received. Thank you for your generosity.')
-
 @section('content')
     <x-ui.section background="base">
         <div class="mx-auto max-w-xl">

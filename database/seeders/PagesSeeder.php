@@ -27,6 +27,8 @@ class PagesSeeder extends Seeder
             ]);
         }
 
+        Page::updateOrCreate(['slug' => 'donate'], ['title' => 'Donate']);
+
         $volunteer = Page::updateOrCreate(['slug' => 'volunteer'], ['title' => 'Become a Volunteer']);
 
         if ($volunteer->seo === null) {
@@ -69,6 +71,51 @@ class PagesSeeder extends Seeder
                 'og_description' => 'Learn about our mission, our story, and the people behind our work.',
                 'twitter_card' => 'summary_large_image',
                 'schema_type' => 'AboutPage',
+            ]);
+        }
+
+        $testimonials = Page::updateOrCreate(['slug' => 'testimonials'], ['title' => 'Testimonials']);
+
+        if ($testimonials->seo === null) {
+            $testimonials->seo()->create([
+                'meta_title' => 'Testimonials — Gauri Ganesh Seva Sanstha',
+                'meta_description' => 'Real stories from the people we serve, our donors, volunteers, and partners — hear firsthand what Gauri Ganesh Seva Sanstha means to the community.',
+                'meta_keywords' => 'testimonials, NGO reviews, beneficiary stories, donor feedback, volunteer experience, Pune',
+                'canonical_url' => url('/testimonials'),
+                'og_title' => 'Voices From Our Community',
+                'og_description' => 'Trust, told by the people who have experienced our work firsthand.',
+                'twitter_card' => 'summary_large_image',
+                'schema_type' => 'CollectionPage',
+            ]);
+        }
+
+        $faq = Page::updateOrCreate(['slug' => 'faq'], ['title' => 'FAQ']);
+
+        if ($faq->seo === null) {
+            $faq->seo()->create([
+                'meta_title' => 'Frequently Asked Questions — Gauri Ganesh Seva Sanstha',
+                'meta_description' => 'Answers to common questions about donating, volunteering, our programmes, payments, and how to get support from Gauri Ganesh Seva Sanstha.',
+                'meta_keywords' => 'FAQ, donation questions, 80G, volunteer questions, NGO help, Pune',
+                'canonical_url' => url('/faq'),
+                'og_title' => 'Frequently Asked Questions',
+                'og_description' => 'Everything you need to know about donating, volunteering, and getting support.',
+                'twitter_card' => 'summary_large_image',
+                'schema_type' => 'FAQPage',
+            ]);
+        }
+
+        $partners = Page::updateOrCreate(['slug' => 'partners'], ['title' => 'Partners & Sponsors']);
+
+        if ($partners->seo === null) {
+            $partners->seo()->create([
+                'meta_title' => 'Partners & Sponsors — Gauri Ganesh Seva Sanstha',
+                'meta_description' => 'The companies, NGOs, institutions and sponsors who work alongside Gauri Ganesh Seva Sanstha to bring food, education and healthcare to families in need.',
+                'meta_keywords' => 'NGO partners, CSR partner, sponsors, Pune NGO collaboration, corporate social responsibility',
+                'canonical_url' => url('/partners'),
+                'og_title' => 'Our Partners & Sponsors',
+                'og_description' => 'Organisations who stand with us in service.',
+                'twitter_card' => 'summary_large_image',
+                'schema_type' => 'CollectionPage',
             ]);
         }
     }

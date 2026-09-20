@@ -1,5 +1,11 @@
 <?php
 
+use App\Enums\MenuLocation;
+use App\Interfaces\MenuItemRepositoryInterface;
+use App\Models\MenuItem;
+use App\Services\SettingsService;
+use Illuminate\Database\Eloquent\Collection;
+
 if (! function_exists('format_inr')) {
     /**
      * Format a numeric amount using Indian digit grouping (e.g. 1,00,000 rather than 100,000).
@@ -22,5 +28,40 @@ if (! function_exists('format_inr')) {
         $formatted = ($decimal === '00') ? $formatted : "{$formatted}.{$decimal}";
 
         return ($isNegative ? '-' : '').($withSymbol ? '₹' : '').$formatted;
+    }
+}
+
+if (! function_exists('setting')) {
+    /**
+     * Read a site setting by "group.key" (e.g. setting('contact.phone_primary')).
+     * Backed by one cached map — safe to call freely from Blade, mail
+     * templates, jobs and notifications without touching the database.
+     */
+    function setting(string $key, mixed $default = null): mixed
+    {
+        return app(SettingsService::class)->get($key, $default);
+    }
+}
+
+if (! function_exists('setting_media')) {
+    /**
+     * URL of a media setting such as setting_media('branding.logo', 'webp'),
+     * or null when nothing has been uploaded.
+     */
+    function setting_media(string $key, ?string $conversion = null): ?string
+    {
+        return app(SettingsService::class)->mediaUrl($key, $conversion);
+    }
+}
+
+if (! function_exists('site_menu')) {
+    /**
+     * Active menu tree for a location ("header", "footer_explore", ...).
+     *
+     * @return Collection<int, MenuItem>
+     */
+    function site_menu(string $location): Collection
+    {
+        return app(MenuItemRepositoryInterface::class)->tree(MenuLocation::from($location));
     }
 }

@@ -37,6 +37,8 @@
                 Active
             </label>
 
+            @include('admin.partials.seo-fields', ['seo' => null, 'model' => null, 'previewTitle' => old('name', 'Category').' Activities', 'previewDescription' => old('description', ''), 'previewUrl' => route('activities.index').'?category=…', 'schemaHint' => 'CollectionPage + BreadcrumbList'])
+
             <div class="flex gap-3">
                 <x-ui.button type="submit">Create Category</x-ui.button>
                 <x-ui.button href="{{ route('admin.activity-categories.index') }}" variant="ghost">Cancel</x-ui.button>

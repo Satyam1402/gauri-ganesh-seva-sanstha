@@ -1,18 +1,8 @@
 @extends('layouts.app')
 
-@section('title', ($campaign ? 'Donate to '.$campaign->name : 'Donate').' — '.config('app.name'))
-@section('meta_description', 'Make a secure donation to '.config('app.name').($campaign ? ' for '.$campaign->name : '').'. Online and offline payment options available.')
-@section('canonical_url', route('donations.donate', $campaign))
-@section('og_title', ($campaign ? 'Donate to '.$campaign->name : 'Donate').' — '.config('app.name'))
-@section('og_description', 'Your generosity powers our seva. Donate securely in under a minute.')
-
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Campaigns', 'url' => route('donations.campaigns.index')],
-            ['label' => 'Donate'],
-        ]" class="mb-4" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-4" />
 
         <x-ui.section-heading
             :heading="$campaign ? 'Donate to '.$campaign->name : 'Make a Donation'"
@@ -139,4 +129,8 @@
             @endif
         </div>
     </x-ui.section>
+
+    <x-partners-section heading="Our Sponsors" subheading="Organisations whose support multiplies every individual gift." type="sponsor" :limit="8" background="muted" />
+
+    <x-faq-section heading="Donation Questions" subheading="Tax receipts, payment methods, and how your money is used." category="donations" :limit="6" background="white" />
 @endsection

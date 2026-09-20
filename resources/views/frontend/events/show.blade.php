@@ -1,70 +1,13 @@
 @extends('layouts.app')
 
 @php
-    $seo = $event->seo;
     $shareUrl = route('events.show', $event);
-    $metaDescription = $seo?->meta_description ?? ($event->short_description ?: 'Event by '.config('app.name').': '.$event->title);
-    $startIso = $event->start_time
-        ? $event->start_date->format('Y-m-d').'T'.\Carbon\Carbon::parse($event->start_time)->format('H:i:s')
-        : $event->start_date->toDateString();
-    $endIso = ($event->end_date ?? $event->start_date)->format('Y-m-d').($event->end_time ? 'T'.\Carbon\Carbon::parse($event->end_time)->format('H:i:s') : '');
     $isCancelled = $event->status->value === 'cancelled';
 @endphp
 
-@section('title', $seo?->meta_title ?? $event->title.' — '.config('app.name'))
-@section('meta_description', $metaDescription)
-@if ($seo?->meta_keywords)
-    @section('meta_keywords', $seo->meta_keywords)
-@endif
-@section('canonical_url', $seo?->canonical_url ?? $shareUrl)
-@section('og_title', $seo?->og_title ?? $event->title)
-@section('og_description', $seo?->og_description ?? $metaDescription)
-@if ($seo?->ogImage ?? $event->getFirstMedia('featured_image'))
-    @section('og_image', ($seo?->ogImage ?? $event->getFirstMedia('featured_image'))->getUrl())
-@endif
-@section('twitter_card', $seo?->twitter_card ?? 'summary_large_image')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode(array_filter([
-            '@@context' => 'https://schema.org',
-            '@type' => $seo?->schema_type ?? 'Event',
-            'name' => $event->title,
-            'description' => $metaDescription,
-            'url' => $shareUrl,
-            'startDate' => $startIso,
-            'endDate' => $endIso ?: null,
-            'eventStatus' => $isCancelled ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
-            'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
-            'image' => $event->getFirstMedia('featured_image')?->getUrl(),
-            'location' => $event->venue || $event->city ? [
-                '@type' => 'Place',
-                'name' => $event->venue ?? $event->city,
-                'address' => array_filter([
-                    '@type' => 'PostalAddress',
-                    'streetAddress' => $event->address,
-                    'addressLocality' => $event->city,
-                    'addressRegion' => $event->state,
-                    'addressCountry' => 'IN',
-                ]),
-            ] : null,
-            'organizer' => $event->organizer ? [
-                '@type' => 'Organization',
-                'name' => $event->organizer,
-            ] : null,
-            'maximumAttendeeCapacity' => $event->max_participants,
-        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Events', 'url' => route('events.index')],
-            ...($event->category ? [['label' => $event->category->name, 'url' => route('events.index', ['category' => $event->category->slug])]] : []),
-            ['label' => $event->title],
-        ]" class="mb-6" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-6" />
 
         @if ($isCancelled)
             <div class="mb-6 rounded-md border border-error-600/30 bg-red-50 px-4 py-3 text-sm font-medium text-error-600 dark:bg-night-surface-alt">

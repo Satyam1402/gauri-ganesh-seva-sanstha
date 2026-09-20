@@ -19,7 +19,10 @@ class BlogPostService
      */
     private const WORDS_PER_MINUTE = 200;
 
-    public function __construct(private BlogPostRepositoryInterface $posts) {}
+    public function __construct(
+        private BlogPostRepositoryInterface $posts,
+        private SeoService $seoService,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data
@@ -215,31 +218,13 @@ class BlogPostService
     }
 
     /**
+     * SEO fields are persisted by the shared SeoService (one write path
+     * for every content type).
+     *
      * @param  array<string, mixed>  $data
      */
     private function syncSeo(BlogPost $post, array $data): void
     {
-        $seo = $post->seo()->firstOrNew();
-
-        $seo->fill([
-            'meta_title' => $data['meta_title'] ?? null,
-            'meta_description' => $data['meta_description'] ?? null,
-            'meta_keywords' => $data['meta_keywords'] ?? null,
-            'canonical_url' => $data['canonical_url'] ?? null,
-            'og_title' => $data['og_title'] ?? null,
-            'og_description' => $data['og_description'] ?? null,
-            'twitter_card' => $data['twitter_card'] ?? 'summary_large_image',
-            'schema_type' => $data['schema_type'] ?? 'Article',
-        ]);
-
-        if ($data['og_image'] ?? null instanceof UploadedFile) {
-            $media = $post->addMedia($data['og_image'])->toMediaCollection('og_image');
-            $seo->og_image_media_id = $media->id;
-        } elseif (! empty($data['remove_og_image'])) {
-            $post->clearMediaCollection('og_image');
-            $seo->og_image_media_id = null;
-        }
-
-        $post->seo()->save($seo);
+        $this->seoService->sync($post, $data + ['schema_type' => 'Article']);
     }
 }

@@ -2,33 +2,13 @@
 
 @php
     $pageTitle = $heading ?? 'Blog & News';
-    $pageSubheading = $subheading ?? 'Stories from the ground — news, updates, success stories, and announcements from '.config('app.name').'.';
+    $pageSubheading = $subheading ?? 'Stories from the ground — news, updates, success stories, and announcements.';
     $isFiltered = ! empty($filters['q']) || ! empty($filters['category']) || ! empty($filters['tag']);
 @endphp
 
-@section('title', $pageTitle.' — '.config('app.name'))
-@section('meta_description', Str::limit($pageSubheading, 160))
-@section('canonical_url', url()->current())
-@section('og_title', $pageTitle.' — '.config('app.name'))
-@section('og_description', Str::limit($pageSubheading, 160))
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => 'CollectionPage',
-            'name' => $pageTitle.' — '.config('app.name'),
-            'url' => url()->current(),
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ...($heading ? [['label' => 'Blog', 'url' => route('blog.index')], ['label' => $heading]] : [['label' => 'Blog']]),
-        ]" class="mb-4" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-4" />
 
         <x-ui.section-heading :heading="$pageTitle" :subheading="$pageSubheading" />
     </x-ui.section>

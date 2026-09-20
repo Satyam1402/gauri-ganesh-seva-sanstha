@@ -91,3 +91,27 @@
         @apply outline-none ring-3 ring-primary-700/35;
     }
 }
+
+/*
+ * Minimal rich-text styling for Markdown rendered from the CMS (FAQ answers,
+ * blog posts). Intentionally small — no typography plugin dependency.
+ */
+@layer components {
+    .prose > :first-child { margin-top: 0; }
+    .prose > :last-child { margin-bottom: 0; }
+    .prose p, .prose ul, .prose ol, .prose blockquote { @apply my-3 leading-relaxed; }
+    .prose ul { @apply list-disc pl-5; }
+    .prose ol { @apply list-decimal pl-5; }
+    .prose li { @apply my-1; }
+    .prose a { @apply font-medium text-primary-700 underline underline-offset-2 hover:text-primary-800 dark:text-night-text; }
+    .prose strong { @apply font-semibold text-text-900 dark:text-night-text; }
+    .prose h2, .prose h3, .prose h4 { @apply mt-6 mb-2; }
+    .prose h2 { @apply text-xl; }
+    .prose h3 { @apply text-lg; }
+    .prose h4 { @apply text-base; }
+    .prose blockquote { @apply border-l-4 border-primary-700/30 pl-4 italic text-text-600 dark:text-night-text-muted; }
+    .prose code { @apply rounded bg-surface-muted px-1 py-0.5 text-[0.9em] dark:bg-night-surface-alt; }
+    .prose hr { @apply my-6 border-border-subtle dark:border-night-border; }
+    .prose img { @apply my-4 h-auto max-w-full rounded-lg; }
+    .prose-invert a { @apply text-night-text; }
+}

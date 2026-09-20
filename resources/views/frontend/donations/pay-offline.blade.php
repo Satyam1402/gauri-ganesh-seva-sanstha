@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Complete Your Donation — '.config('app.name'))
-@section('meta_description', 'Instructions to complete your donation to '.config('app.name').'.')
-
 @section('content')
     <x-ui.section background="base">
         <div class="mx-auto max-w-2xl space-y-6">
@@ -68,9 +65,24 @@
                         </div>
                     </dl>
 
+                    @if ($qr = setting_media('donation.upi_qr', 'webp'))
+                        <div class="mt-5 flex justify-center">
+                            <img src="{{ $qr }}" alt="UPI QR code for {{ $upi['payee_name'] }}" width="220" height="220" loading="lazy" class="h-56 w-56 rounded-lg border border-border-subtle bg-white object-contain p-2 dark:border-night-border">
+                        </div>
+                    @endif
+
                     <div class="mt-5 text-center">
                         <x-ui.button href="{{ $upi['link'] }}" variant="accent">Open UPI App</x-ui.button>
                         <p class="mt-2 text-xs text-text-400 dark:text-night-text-muted">On mobile, this opens Google Pay, PhonePe, or any UPI app with the amount prefilled.</p>
+                    </div>
+                </x-ui.card>
+            @endif
+
+            @if ($instructions = setting('donation.instructions'))
+                <x-ui.card>
+                    <h2 class="font-display text-lg font-semibold text-text-900 dark:text-night-text">Donation Instructions</h2>
+                    <div class="prose mt-4 text-sm text-text-600 dark:text-night-text-muted">
+                        {!! Str::markdown($instructions, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
                     </div>
                 </x-ui.card>
             @endif

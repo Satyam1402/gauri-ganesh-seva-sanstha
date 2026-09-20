@@ -12,7 +12,7 @@
 >
     <div class="flex h-16 items-center border-b border-border-subtle px-6 dark:border-night-border">
         <a href="{{ route('admin.dashboard') }}" class="font-display text-lg font-semibold text-primary-700 dark:text-night-text">
-            {{ config('app.name') }}
+            {{ setting('general.site_name', config('app.name')) }}
         </a>
     </div>
 
@@ -20,6 +20,9 @@
         <div>
             <p class="px-2 text-xs font-semibold uppercase tracking-wide text-text-400 dark:text-night-text-muted">Overview</p>
             <a href="{{ route('admin.dashboard') }}" class="{{ $navLink('admin.dashboard', 'admin.dashboard') }}">Dashboard</a>
+            @can('view-any-reports')
+                <a href="{{ route('admin.reports.index') }}" class="{{ $navLink('admin.reports.index', 'admin.reports.*') }}">Reports</a>
+            @endcan
         </div>
 
         <div>
@@ -31,7 +34,7 @@
                 <a href="{{ route('admin.donations.index') }}" class="{{ $navLink('admin.donations.index', 'admin.donations.*') }}">Donations</a>
             @endcan
             @can('viewReports', App\Models\Donation::class)
-                <a href="{{ route('admin.donation-reports.index') }}" class="{{ $navLink('admin.donation-reports.index', 'admin.donation-reports.*') }}">Reports</a>
+                <a href="{{ route('admin.reports.show', 'donations') }}" class="{{ $navLink('admin.reports.show', 'admin.reports.show') }}">Donation Reports</a>
             @endcan
         </div>
 
@@ -47,7 +50,9 @@
                 <a href="{{ route('admin.contact-enquiries.index') }}" class="{{ $navLink('admin.contact-enquiries.index', 'admin.contact-enquiries.*') }}">Enquiries</a>
             @endcan
             <span class="{{ $comingSoon }}" title="Coming soon">Help Requests</span>
-            <span class="{{ $comingSoon }}" title="Coming soon">Testimonials</span>
+            @can('viewAny', App\Models\Testimonial::class)
+                <a href="{{ route('admin.testimonials.index') }}" class="{{ $navLink('admin.testimonials.index', 'admin.testimonials.*') }}">Testimonials</a>
+            @endcan
         </div>
 
         <div>
@@ -70,12 +75,22 @@
             @can('viewAny', App\Models\GalleryAlbum::class)
                 <a href="{{ route('admin.gallery-albums.index') }}" class="{{ $navLink('admin.gallery-albums.index', 'admin.gallery-*') }}">Gallery</a>
             @endcan
+            @can('viewAny', App\Models\Faq::class)
+                <a href="{{ route('admin.faqs.index') }}" class="{{ $navLink('admin.faqs.index', 'admin.faq*') }}">FAQs</a>
+            @endcan
+            @can('viewAny', App\Models\Partner::class)
+                <a href="{{ route('admin.partners.index') }}" class="{{ $navLink('admin.partners.index', 'admin.partner*') }}">Partners</a>
+            @endcan
             <span class="{{ $comingSoon }}" title="Coming soon">Team</span>
         </div>
 
         <div>
             <p class="px-2 text-xs font-semibold uppercase tracking-wide text-text-400 dark:text-night-text-muted">System</p>
-            <span class="{{ $comingSoon }}" title="Coming soon">Settings</span>
+            @can('manage settings')
+                <a href="{{ route('admin.settings.edit', 'general') }}" class="{{ $navLink('admin.settings.edit', 'admin.settings.*') }}">Settings</a>
+                <a href="{{ route('admin.menu-items.index') }}" class="{{ $navLink('admin.menu-items.index', 'admin.menu-items.*') }}">Navigation</a>
+                <a href="{{ route('admin.seo.index') }}" class="{{ $navLink('admin.seo.index', 'admin.seo.*') }}">SEO</a>
+            @endcan
             @can('viewAny', App\Models\User::class)
                 <a href="{{ route('admin.users.index') }}" class="{{ $navLink('admin.users.index', 'admin.users.*') }}">Users</a>
             @endcan

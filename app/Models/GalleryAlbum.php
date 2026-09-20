@@ -100,6 +100,7 @@ class GalleryAlbum extends Model implements HasMedia
     {
         $this->addMediaCollection('cover_image')->singleFile();
         $this->addMediaCollection('og_image')->singleFile();
+        $this->addMediaCollection('twitter_image')->singleFile();
     }
 
     /**

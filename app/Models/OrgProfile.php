@@ -20,11 +20,14 @@ class OrgProfile extends Model implements HasMedia
         'trust_deed_no',
         'section_80g_no',
         'section_12a_no',
+        'ngo_registration_no',
         'established_year',
+        'about_short',
         'address_line',
         'city',
         'state',
         'pin_code',
+        'country',
         'phone_primary',
         'phone_secondary',
         'email_primary',
@@ -38,6 +41,7 @@ class OrgProfile extends Model implements HasMedia
         'twitter_url',
         'youtube_url',
         'linkedin_url',
+        'telegram_url',
     ];
 
     protected function casts(): array
@@ -71,6 +75,7 @@ class OrgProfile extends Model implements HasMedia
             'twitter' => $this->twitter_url,
             'youtube' => $this->youtube_url,
             'linkedin' => $this->linkedin_url,
+            'telegram' => $this->telegram_url,
         ]);
     }
 

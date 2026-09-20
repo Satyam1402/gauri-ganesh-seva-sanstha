@@ -38,6 +38,8 @@
                 Active
             </label>
 
+            @include('admin.partials.seo-fields', ['seo' => $category->seo, 'model' => $category, 'previewTitle' => old('name', $category->name).' Activities', 'previewDescription' => old('description', $category->description ?? ''), 'previewUrl' => route('activities.index', ['category' => $category->slug]), 'schemaHint' => 'CollectionPage + BreadcrumbList'])
+
             <div class="flex gap-3">
                 <x-ui.button type="submit">Save Changes</x-ui.button>
                 <x-ui.button href="{{ route('admin.activity-categories.index') }}" variant="ghost">Back to Categories</x-ui.button>

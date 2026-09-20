@@ -1,29 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Events — '.config('app.name'))
-@section('meta_description', 'Upcoming food distributions, medical camps, awareness campaigns, and community events organised by '.config('app.name').'. Register to take part.')
-@section('canonical_url', url('/events'))
-@section('og_title', 'Events — '.config('app.name'))
-@section('og_description', 'Upcoming community events organised by '.config('app.name').' — see the schedule and register to take part.')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => 'CollectionPage',
-            'name' => 'Events — '.config('app.name'),
-            'url' => url('/events'),
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
-@php
-    $when = $filters['when'] ?? 'upcoming';
-@endphp
+@php $when = $filters['when'] ?? 'upcoming'; @endphp
 
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[['label' => 'Home', 'url' => route('home')], ['label' => 'Events']]" class="mb-4" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-4" />
 
         <x-ui.section-heading heading="Our Events" subheading="Join us on the ground — from food drives to medical camps, there's always a way to take part." />
     </x-ui.section>

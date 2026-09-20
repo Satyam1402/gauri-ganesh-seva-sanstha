@@ -1,53 +1,10 @@
 @extends('layouts.app')
 
-@php
-    $seo = $activity->seo;
-    $shareUrl = route('activities.show', $activity);
-    $metaDescription = $seo?->meta_description ?? $activity->short_description;
-@endphp
-
-@section('title', $seo?->meta_title ?? $activity->title.' — '.config('app.name'))
-@section('meta_description', $metaDescription)
-@if ($seo?->meta_keywords)
-    @section('meta_keywords', $seo->meta_keywords)
-@endif
-@section('canonical_url', $seo?->canonical_url ?? $shareUrl)
-@section('og_title', $seo?->og_title ?? $activity->title)
-@section('og_description', $seo?->og_description ?? $metaDescription)
-@if ($seo?->ogImage ?? $activity->getFirstMedia('featured_image'))
-    @section('og_image', ($seo?->ogImage ?? $activity->getFirstMedia('featured_image'))->getUrl())
-@endif
-@section('twitter_card', $seo?->twitter_card ?? 'summary_large_image')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode(array_filter([
-            '@@context' => 'https://schema.org',
-            '@type' => $seo?->schema_type ?? 'Event',
-            'name' => $activity->title,
-            'description' => $metaDescription,
-            'startDate' => $activity->activity_date->toDateString(),
-            'image' => $activity->getFirstMedia('featured_image')?->getUrl(),
-            'location' => $activity->location ? [
-                '@type' => 'Place',
-                'name' => $activity->location,
-            ] : null,
-            'organizer' => $activity->organizer ? [
-                '@type' => 'Organization',
-                'name' => $activity->organizer,
-            ] : null,
-        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
+@php $shareUrl = route('activities.show', $activity); @endphp
 
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Activities', 'url' => route('activities.index')],
-            ...($activity->category ? [['label' => $activity->category->name, 'url' => route('activities.index', ['category' => $activity->category->slug])]] : []),
-            ['label' => $activity->title],
-        ]" class="mb-6" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-6" />
 
         <div class="h-72 w-full overflow-hidden rounded-xl sm:h-96">
             <x-ui.lazy-image :media="$activity->getFirstMedia('featured_image')" :alt="$activity->title" conversion="webp" />
@@ -125,6 +82,8 @@
             </div>
         @endif
     </x-ui.section>
+
+    <x-testimonials-section heading="Voices From This Work" :for="$activity" type="beneficiary" :limit="3" background="white" />
 
     @if ($related->isNotEmpty())
         <x-ui.section background="muted">

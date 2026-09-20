@@ -17,8 +17,12 @@ class PageSeoController extends Controller
     {
         $this->authorize('update', $page);
 
+        $meta = SeoManagerController::PAGES[$page->slug] ?? null;
+
         return view('admin.pages.seo', [
-            'page' => $page->load('seo'),
+            'page' => $page->load(['seo.ogImage', 'seo.twitterImage']),
+            'publicUrl' => $meta ? route($meta['route']) : url('/'.$page->slug),
+            'schemaHint' => $meta['schema'] ?? 'BreadcrumbList',
         ]);
     }
 

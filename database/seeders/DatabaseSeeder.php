@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
+            SettingsSeeder::class,
+            MenuItemsSeeder::class,
             PagesSeeder::class,
             HomeSectionsSeeder::class,
             OrgProfileSeeder::class,
@@ -32,6 +34,11 @@ class DatabaseSeeder extends Seeder
             BlogPostsSeeder::class,
             VolunteerApplicationsSeeder::class,
             ContactEnquiriesSeeder::class,
+            TestimonialsSeeder::class,
+            FaqCategoriesSeeder::class,
+            FaqsSeeder::class,
+            PartnerTypesSeeder::class,
+            PartnersSeeder::class,
         ]);
     }
 }

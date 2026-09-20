@@ -14,9 +14,15 @@ use App\Interfaces\DonationRepositoryInterface;
 use App\Interfaces\EventCategoryRepositoryInterface;
 use App\Interfaces\EventRegistrationRepositoryInterface;
 use App\Interfaces\EventRepositoryInterface;
+use App\Interfaces\FaqCategoryRepositoryInterface;
+use App\Interfaces\FaqRepositoryInterface;
 use App\Interfaces\GalleryAlbumRepositoryInterface;
 use App\Interfaces\GalleryCategoryRepositoryInterface;
 use App\Interfaces\HomeSectionRepositoryInterface;
+use App\Interfaces\MenuItemRepositoryInterface;
+use App\Interfaces\PartnerRepositoryInterface;
+use App\Interfaces\PartnerTypeRepositoryInterface;
+use App\Interfaces\TestimonialRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\VolunteerApplicationRepositoryInterface;
 use App\Models\User;
@@ -33,11 +39,18 @@ use App\Repositories\DonationRepository;
 use App\Repositories\EventCategoryRepository;
 use App\Repositories\EventRegistrationRepository;
 use App\Repositories\EventRepository;
+use App\Repositories\FaqCategoryRepository;
+use App\Repositories\FaqRepository;
 use App\Repositories\GalleryAlbumRepository;
 use App\Repositories\GalleryCategoryRepository;
 use App\Repositories\HomeSectionRepository;
+use App\Repositories\MenuItemRepository;
+use App\Repositories\PartnerRepository;
+use App\Repositories\PartnerTypeRepository;
+use App\Repositories\TestimonialRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\VolunteerApplicationRepository;
+use App\Support\Reports\ReportAccess;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -67,6 +80,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BlogCommentRepositoryInterface::class, BlogCommentRepository::class);
         $this->app->bind(VolunteerApplicationRepositoryInterface::class, VolunteerApplicationRepository::class);
         $this->app->bind(ContactEnquiryRepositoryInterface::class, ContactEnquiryRepository::class);
+        $this->app->bind(TestimonialRepositoryInterface::class, TestimonialRepository::class);
+        $this->app->bind(FaqCategoryRepositoryInterface::class, FaqCategoryRepository::class);
+        $this->app->bind(FaqRepositoryInterface::class, FaqRepository::class);
+        $this->app->bind(PartnerTypeRepositoryInterface::class, PartnerTypeRepository::class);
+        $this->app->bind(PartnerRepositoryInterface::class, PartnerRepository::class);
+        $this->app->bind(MenuItemRepositoryInterface::class, MenuItemRepository::class);
     }
 
     /**
@@ -77,6 +96,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(fn (User $user) => $user->hasRole('Super Admin') ? true : null);
 
         Gate::policy(Role::class, RolePolicy::class);
+
+        // Report abilities are derived from module permissions (no role checks).
+        ReportAccess::register();
 
         RedirectIfAuthenticated::redirectUsing(fn () => route('admin.dashboard'));
     }

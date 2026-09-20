@@ -12,7 +12,11 @@
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e5ded2;">
                     <tr>
                         <td style="background-color:#8a3324; padding:24px 32px;">
-                            <p style="margin:0; font-size:20px; font-weight:bold; color:#ffffff;">{{ config('app.name') }}</p>
+                            @if ($emailLogo = setting_media('branding.email_logo') ?? setting_media('branding.logo_light') ?? setting_media('branding.logo'))
+                                <img src="{{ $emailLogo }}" alt="{{ config('app.name') }}" height="40" style="display:block; height:40px; width:auto; max-width:220px;">
+                            @else
+                                <p style="margin:0; font-size:20px; font-weight:bold; color:#ffffff;">{{ config('app.name') }}</p>
+                            @endif
                         </td>
                     </tr>
                     <tr>

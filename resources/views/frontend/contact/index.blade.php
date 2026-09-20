@@ -1,83 +1,9 @@
 @extends('layouts.app')
 
-@php
-    $seo = $page?->seo;
-    $pageUrl = route('contact');
-    // SEO fallback chains deliberately end in string literals — an inline
-    // @section with a null value leaks an unclosed output buffer.
-    $metaDescription = $seo?->meta_description
-        ?? 'Contact '.config('app.name').' — reach us by phone, email, WhatsApp, or the enquiry form for donations, volunteering, partnerships, and general questions.';
-@endphp
-
-@section('title', $seo?->meta_title ?? 'Contact Us — '.config('app.name'))
-@section('meta_description', $metaDescription)
-@if ($seo?->meta_keywords)
-    @section('meta_keywords', $seo->meta_keywords)
-@endif
-@section('canonical_url', $seo?->canonical_url ?? $pageUrl)
-@section('og_title', $seo?->og_title ?? 'Contact Us')
-@section('og_description', $seo?->og_description ?? $metaDescription)
-@if ($seo?->ogImage)
-    @section('og_image', $seo->ogImage->getUrl())
-@endif
-@section('twitter_card', $seo?->twitter_card ?? 'summary_large_image')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode(array_filter([
-            '@@context' => 'https://schema.org',
-            '@type' => $seo?->schema_type ?? 'ContactPage',
-            'name' => $seo?->meta_title ?? 'Contact Us',
-            'description' => $metaDescription,
-            'url' => $pageUrl,
-            'mainEntity' => [
-                '@type' => 'NGO',
-                'name' => config('app.name'),
-                'url' => url('/'),
-                'address' => $orgProfile?->addressLine() ? array_filter([
-                    '@type' => 'PostalAddress',
-                    'streetAddress' => $orgProfile->address_line,
-                    'addressLocality' => $orgProfile->city,
-                    'addressRegion' => $orgProfile->state,
-                    'postalCode' => $orgProfile->pin_code,
-                    'addressCountry' => 'IN',
-                ]) : null,
-                'contactPoint' => array_values(array_filter([
-                    $orgProfile?->phone_primary ? [
-                        '@type' => 'ContactPoint',
-                        'telephone' => $orgProfile->phone_primary,
-                        'contactType' => 'customer support',
-                        'areaServed' => 'IN',
-                    ] : null,
-                    $orgProfile?->email_primary ? [
-                        '@type' => 'ContactPoint',
-                        'email' => $orgProfile->email_primary,
-                        'contactType' => 'customer support',
-                    ] : null,
-                ])),
-                'sameAs' => array_values($orgProfile?->socialLinks() ?? []),
-            ],
-        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => 'BreadcrumbList',
-            'itemListElement' => [
-                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
-                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Contact Us', 'item' => $pageUrl],
-            ],
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
 @section('content')
     {{-- Hero --}}
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Contact Us'],
-        ]" class="mb-6" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-6" />
 
         <div class="mx-auto max-w-3xl text-center">
             <p class="text-sm font-semibold uppercase tracking-wide text-accent-500">We'd Love to Hear From You</p>
@@ -179,6 +105,8 @@
     </x-ui.section>
 
     {{-- Form + map --}}
+    <x-faq-section heading="Before You Write to Us" subheading="Your question may already be answered here." :featured="true" :limit="5" background="muted" />
+
     <x-ui.section background="white" spacing="lg" id="contact-form">
         <div class="grid grid-cols-1 gap-10 lg:grid-cols-2">
             <div>

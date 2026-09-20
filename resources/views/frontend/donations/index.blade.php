@@ -1,25 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Donation Campaigns — '.config('app.name'))
-@section('meta_description', 'Support food distribution, education, medical assistance, and other seva programs run by '.config('app.name').'. Every contribution counts.')
-@section('canonical_url', url('/campaigns'))
-@section('og_title', 'Donation Campaigns — '.config('app.name'))
-@section('og_description', 'Choose a cause close to your heart and make a difference today.')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => 'CollectionPage',
-            'name' => 'Donation Campaigns — '.config('app.name'),
-            'url' => url('/campaigns'),
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[['label' => 'Home', 'url' => route('home')], ['label' => 'Campaigns']]" class="mb-4" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-4" />
 
         <x-ui.section-heading heading="Donation Campaigns" subheading="Choose a cause close to your heart — every rupee goes directly to the community." />
 

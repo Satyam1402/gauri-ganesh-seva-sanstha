@@ -10,26 +10,40 @@ use App\Http\Controllers\Admin\ContactEnquiryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DonationCampaignController;
 use App\Http\Controllers\Admin\DonationController;
-use App\Http\Controllers\Admin\DonationReportController;
 use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventRegistrationController;
+use App\Http\Controllers\Admin\FaqCategoryController;
+use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\GalleryAlbumController;
 use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\GalleryPhotoController;
 use App\Http\Controllers\Admin\GalleryVideoController;
 use App\Http\Controllers\Admin\HomeSectionController;
+use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\OrgProfileController;
 use App\Http\Controllers\Admin\PageSeoController;
+use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\PartnerTypeController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SeoManagerController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VolunteerApplicationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Reports authorise per-report Gate abilities inside the controller
+    // (derived from module permissions — see App\Support\Reports\ReportAccess).
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/{report}/export', [ReportController::class, 'export'])->name('reports.export')->whereAlpha('report');
+    Route::get('reports/{report}', [ReportController::class, 'show'])->name('reports.show')->whereAlpha('report');
 
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -97,7 +111,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 
     Route::middleware('permission:manage reports|manage donations')->group(function () {
-        Route::get('donation-reports', [DonationReportController::class, 'index'])->name('donation-reports.index');
+        Route::get('donation-reports', fn () => redirect()->route('admin.reports.show', 'donations'))->name('donation-reports.index');
     });
 
     Route::middleware('permission:manage blog')->group(function () {
@@ -171,6 +185,72 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::patch('volunteer-applications/{volunteer_application}/restore', [VolunteerApplicationController::class, 'restore'])->name('volunteer-applications.restore')->withTrashed();
         Route::delete('volunteer-applications/{volunteer_application}', [VolunteerApplicationController::class, 'destroy'])->name('volunteer-applications.destroy');
         Route::get('volunteer-applications/{volunteer_application}/documents/{collection}', [VolunteerApplicationController::class, 'downloadDocument'])->name('volunteer-applications.document');
+    });
+
+    Route::middleware('permission:manage testimonials')->group(function () {
+        // Bulk endpoints sit above the resource so they are never captured
+        // by the {testimonial} wildcard.
+        Route::post('testimonials/bulk-delete', [TestimonialController::class, 'bulkDestroy'])->name('testimonials.bulk-delete');
+        Route::post('testimonials/bulk-status', [TestimonialController::class, 'bulkUpdateStatus'])->name('testimonials.bulk-status');
+
+        Route::patch('testimonials/{testimonial}/feature', [TestimonialController::class, 'toggleFeatured'])->name('testimonials.feature');
+        Route::patch('testimonials/{testimonial}/order', [TestimonialController::class, 'updateOrder'])->name('testimonials.order');
+        Route::patch('testimonials/{testimonial}/publish', [TestimonialController::class, 'publish'])->name('testimonials.publish');
+        Route::patch('testimonials/{testimonial}/unpublish', [TestimonialController::class, 'unpublish'])->name('testimonials.unpublish');
+        Route::patch('testimonials/{testimonial}/archive', [TestimonialController::class, 'archive'])->name('testimonials.archive');
+        Route::patch('testimonials/{testimonial}/restore', [TestimonialController::class, 'restore'])->name('testimonials.restore')->withTrashed();
+        Route::resource('testimonials', TestimonialController::class);
+    });
+
+    Route::middleware('permission:manage faqs')->group(function () {
+        Route::post('faq-categories/reorder', [FaqCategoryController::class, 'reorder'])->name('faq-categories.reorder');
+        Route::patch('faq-categories/{faq_category}/toggle', [FaqCategoryController::class, 'toggle'])->name('faq-categories.toggle');
+        Route::resource('faq-categories', FaqCategoryController::class)->except(['show']);
+
+        // Bulk endpoints sit above the resource so they are never captured
+        // by the {faq} wildcard.
+        Route::post('faqs/bulk-delete', [FaqController::class, 'bulkDestroy'])->name('faqs.bulk-delete');
+        Route::post('faqs/bulk-update', [FaqController::class, 'bulkUpdate'])->name('faqs.bulk-update');
+
+        Route::patch('faqs/{faq}/feature', [FaqController::class, 'toggleFeatured'])->name('faqs.feature');
+        Route::patch('faqs/{faq}/order', [FaqController::class, 'updateOrder'])->name('faqs.order');
+        Route::patch('faqs/{faq}/publish', [FaqController::class, 'publish'])->name('faqs.publish');
+        Route::patch('faqs/{faq}/unpublish', [FaqController::class, 'unpublish'])->name('faqs.unpublish');
+        Route::patch('faqs/{faq}/archive', [FaqController::class, 'archive'])->name('faqs.archive');
+        Route::patch('faqs/{faq}/restore', [FaqController::class, 'restore'])->name('faqs.restore')->withTrashed();
+        Route::resource('faqs', FaqController::class);
+    });
+
+    Route::middleware('permission:manage partners')->group(function () {
+        Route::post('partner-types/reorder', [PartnerTypeController::class, 'reorder'])->name('partner-types.reorder');
+        Route::patch('partner-types/{partner_type}/toggle', [PartnerTypeController::class, 'toggle'])->name('partner-types.toggle');
+        Route::resource('partner-types', PartnerTypeController::class)->except(['show']);
+
+        // Bulk endpoints sit above the resource so they are never captured
+        // by the {partner} wildcard.
+        Route::post('partners/bulk-delete', [PartnerController::class, 'bulkDestroy'])->name('partners.bulk-delete');
+        Route::post('partners/bulk-update', [PartnerController::class, 'bulkUpdate'])->name('partners.bulk-update');
+
+        Route::patch('partners/{partner}/feature', [PartnerController::class, 'toggleFeatured'])->name('partners.feature');
+        Route::patch('partners/{partner}/order', [PartnerController::class, 'updateOrder'])->name('partners.order');
+        Route::patch('partners/{partner}/activate', [PartnerController::class, 'activate'])->name('partners.activate');
+        Route::patch('partners/{partner}/deactivate', [PartnerController::class, 'deactivate'])->name('partners.deactivate');
+        Route::patch('partners/{partner}/archive', [PartnerController::class, 'archive'])->name('partners.archive');
+        Route::patch('partners/{partner}/restore', [PartnerController::class, 'restore'])->name('partners.restore')->withTrashed();
+        Route::resource('partners', PartnerController::class);
+    });
+
+    Route::middleware('permission:manage settings')->group(function () {
+        Route::get('seo', [SeoManagerController::class, 'index'])->name('seo.index');
+        Route::post('seo/refresh-sitemap', [SeoManagerController::class, 'refreshSitemap'])->name('seo.refresh-sitemap');
+
+        Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::get('settings/{group}', [SettingsController::class, 'edit'])->name('settings.edit');
+        Route::put('settings/{group}', [SettingsController::class, 'update'])->name('settings.update');
+
+        Route::post('menu-items/reorder', [MenuItemController::class, 'reorder'])->name('menu-items.reorder');
+        Route::patch('menu-items/{menu_item}/toggle', [MenuItemController::class, 'toggle'])->name('menu-items.toggle');
+        Route::resource('menu-items', MenuItemController::class)->except(['show']);
     });
 
     Route::middleware('permission:manage gallery')->group(function () {

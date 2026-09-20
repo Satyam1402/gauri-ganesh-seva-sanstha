@@ -182,7 +182,14 @@ class DonationManagementTest extends TestCase
         $this->assertStringContainsString('spreadsheetml', $response->headers->get('Content-Type'));
     }
 
-    public function test_reports_page_shows_revenue_summary_and_top_donors(): void
+    public function test_legacy_reports_route_redirects_to_donation_report(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('admin.donation-reports.index'))
+            ->assertRedirect(route('admin.reports.show', 'donations'));
+    }
+
+    public function test_donation_report_shows_aggregates_without_donor_details(): void
     {
         Mail::fake();
 
@@ -190,19 +197,19 @@ class DonationManagementTest extends TestCase
         $donation = $this->pendingDonation($campaign);
         $this->actingAs($this->admin())->patch(route('admin.donations.complete', $donation));
 
-        $response = $this->actingAs($this->admin())->get(route('admin.donation-reports.index'));
+        $response = $this->actingAs($this->admin())->get(route('admin.reports.show', ['report' => 'donations', 'period' => 'all']));
 
         $response->assertOk();
         $response->assertSee('Total Raised');
-        $response->assertSee('Suresh Patil');
         $response->assertSee('Medical Assistance');
+        $response->assertDontSee('Suresh Patil');
     }
 
-    public function test_donation_manager_can_access_reports(): void
+    public function test_donation_manager_can_access_donation_report(): void
     {
         $manager = User::factory()->create();
         $manager->assignRole(RoleEnum::DonationManager->value);
 
-        $this->actingAs($manager)->get(route('admin.donation-reports.index'))->assertOk();
+        $this->actingAs($manager)->get(route('admin.reports.show', 'donations'))->assertOk();
     }
 }

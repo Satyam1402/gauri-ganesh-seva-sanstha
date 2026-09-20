@@ -34,6 +34,13 @@ class DonationController extends Controller
         }
 
         return view('frontend.donations.donate', [
+            'seo' => $this->seo()->forPage('donate', [
+                'title' => $campaign ? 'Donate to '.$campaign->name : 'Donate',
+                'description' => $campaign?->short_description ?: 'Make a secure online donation to '.setting('general.site_name').' and help bring food, education and healthcare to families in need.',
+                'canonical' => $campaign ? route('donations.donate', $campaign) : route('donations.donate'),
+                'image' => $campaign?->getFirstMedia('featured_image')?->getUrl(),
+                'breadcrumbs' => [['label' => 'Home', 'url' => route('home')], ['label' => 'Donate']],
+            ]),
             'campaign' => $campaign,
             'campaigns' => $this->campaigns->activeOrdered(),
             'gatewayOptions' => $this->gateways->enabledOptions(),
@@ -75,9 +82,10 @@ class DonationController extends Controller
             return redirect()->route('donations.failed', $donation);
         }
 
+        // Payment screens are personal and transient — never indexed.
         return $initiation->isRedirect()
             ? redirect()->away($initiation->redirectUrl)
-            : view($initiation->view, $initiation->data);
+            : view($initiation->view, $initiation->data + ['seo' => $this->seo()->make(['title' => 'Complete Your Donation', 'robots' => 'noindex, nofollow', 'canonical' => route('donations.donate')])]);
     }
 
     /**
@@ -112,6 +120,7 @@ class DonationController extends Controller
     {
         return view('frontend.donations.success', [
             'donation' => $donation->load('campaign'),
+            'seo' => $this->seo()->make(['title' => 'Thank You for Your Donation', 'robots' => 'noindex, nofollow', 'canonical' => route('donations.donate')]),
         ]);
     }
 
@@ -119,6 +128,7 @@ class DonationController extends Controller
     {
         return view('frontend.donations.failed', [
             'donation' => $donation->load('campaign'),
+            'seo' => $this->seo()->make(['title' => 'Payment Not Completed', 'robots' => 'noindex, nofollow', 'canonical' => route('donations.donate')]),
         ]);
     }
 }

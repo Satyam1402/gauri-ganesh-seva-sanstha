@@ -1,14 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Application Received — '.config('app.name'))
-@section('meta_description', 'Thank you for applying to volunteer with '.config('app.name').'. Our team will review your application and get back to you soon.')
-@section('canonical_url', route('volunteer.create'))
-
-@push('structured_data')
-    {{-- Post-submission page: keep it out of search indexes. --}}
-    <meta name="robots" content="noindex, nofollow">
-@endpush
-
 @section('content')
     <x-ui.section background="base" spacing="lg">
         <div class="mx-auto max-w-2xl text-center">

@@ -1,25 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Photo Gallery — '.config('app.name'))
-@section('meta_description', 'Browse photo albums and videos from events, activities, and community programs run by '.config('app.name').'.')
-@section('canonical_url', url('/gallery'))
-@section('og_title', 'Photo Gallery — '.config('app.name'))
-@section('og_description', 'Browse photo albums and videos from events and community programs run by '.config('app.name').'.')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => 'CollectionPage',
-            'name' => 'Photo Gallery — '.config('app.name'),
-            'url' => url('/gallery'),
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[['label' => 'Home', 'url' => route('home')], ['label' => 'Gallery']]" class="mb-4" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-4" />
 
         <x-ui.section-heading heading="Photo Gallery" subheading="Moments from our events, camps, and community programs." />
     </x-ui.section>

@@ -66,6 +66,7 @@ class Activity extends Model implements HasMedia
         $this->addMediaCollection('featured_image')->singleFile();
         $this->addMediaCollection('gallery');
         $this->addMediaCollection('og_image')->singleFile();
+        $this->addMediaCollection('twitter_image')->singleFile();
     }
 
     /**

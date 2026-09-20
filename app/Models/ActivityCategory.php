@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasSeo;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ActivityCategory extends Model
 {
-    use HasSlug;
+    use HasSeo, HasSlug;
 
     protected string $slugSource = 'name';
 

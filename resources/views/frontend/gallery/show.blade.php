@@ -1,48 +1,10 @@
 @extends('layouts.app')
 
-@php
-    $seo = $album->seo;
-    $shareUrl = route('gallery.show', $album);
-    $metaDescription = $seo?->meta_description
-        ?? ($album->description ? Str::limit($album->description, 160) : 'Photo album from '.config('app.name').': '.$album->title);
-    $cover = $album->coverMedia();
-@endphp
-
-@section('title', $seo?->meta_title ?? $album->title.' — '.config('app.name'))
-@section('meta_description', $metaDescription)
-@if ($seo?->meta_keywords)
-    @section('meta_keywords', $seo->meta_keywords)
-@endif
-@section('canonical_url', $seo?->canonical_url ?? $shareUrl)
-@section('og_title', $seo?->og_title ?? $album->title)
-@section('og_description', $seo?->og_description ?? $metaDescription)
-@if ($seo?->ogImage ?? $cover)
-    @section('og_image', ($seo?->ogImage ?? $cover)->getUrl())
-@endif
-@section('twitter_card', $seo?->twitter_card ?? 'summary_large_image')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode(array_filter([
-            '@@context' => 'https://schema.org',
-            '@type' => $seo?->schema_type ?? 'ImageGallery',
-            'name' => $album->title,
-            'description' => $metaDescription,
-            'url' => $shareUrl,
-            'image' => $cover?->getUrl(),
-            'datePublished' => $album->event_date?->toDateString(),
-        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
+@php $shareUrl = route('gallery.show', $album); @endphp
 
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Gallery', 'url' => route('gallery.index')],
-            ...($album->category ? [['label' => $album->category->name, 'url' => route('gallery.index', ['category' => $album->category->slug])]] : []),
-            ['label' => $album->title],
-        ]" class="mb-6" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-6" />
 
         @if ($album->category)
             <x-ui.badge variant="accent">{{ $album->category->name }}</x-ui.badge>

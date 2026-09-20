@@ -1,58 +1,10 @@
 @extends('layouts.app')
 
-@php
-    $seo = $post->seo;
-    $shareUrl = route('blog.show', $post);
-    $metaDescription = $seo?->meta_description ?? Str::limit($post->excerpt, 160);
-@endphp
-
-@section('title', $seo?->meta_title ?? $post->title.' — '.config('app.name'))
-@section('meta_description', $metaDescription)
-@if ($seo?->meta_keywords)
-    @section('meta_keywords', $seo->meta_keywords)
-@endif
-@section('canonical_url', $seo?->canonical_url ?? $shareUrl)
-@section('og_title', $seo?->og_title ?? $post->title)
-@section('og_description', $seo?->og_description ?? $metaDescription)
-@if ($seo?->ogImage ?? $post->getFirstMedia('featured_image'))
-    @section('og_image', ($seo?->ogImage ?? $post->getFirstMedia('featured_image'))->getUrl())
-@endif
-@section('twitter_card', $seo?->twitter_card ?? 'summary_large_image')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode(array_filter([
-            '@@context' => 'https://schema.org',
-            '@type' => $seo?->schema_type ?? 'Article',
-            'headline' => $post->title,
-            'description' => $metaDescription,
-            'image' => $post->getFirstMedia('featured_image')?->getUrl(),
-            'datePublished' => $post->published_at->toIso8601String(),
-            'dateModified' => $post->updated_at->toIso8601String(),
-            'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $shareUrl],
-            'author' => [
-                '@type' => 'Person',
-                'name' => $post->author?->name ?? config('app.name'),
-            ],
-            'publisher' => [
-                '@type' => 'Organization',
-                'name' => config('app.name'),
-                'url' => url('/'),
-            ],
-            'articleSection' => $post->category?->name,
-            'keywords' => $post->tags->pluck('name')->implode(', ') ?: null,
-        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
+@php $shareUrl = route('blog.show', $post); @endphp
 
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Blog', 'url' => route('blog.index')],
-            ...($post->category ? [['label' => $post->category->name, 'url' => route('blog.category', $post->category)]] : []),
-            ['label' => $post->title],
-        ]" class="mb-6" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-6" />
 
         <div class="h-72 w-full overflow-hidden rounded-xl sm:h-96">
             <x-ui.lazy-image :media="$post->getFirstMedia('featured_image')" :alt="$post->title" conversion="webp" />

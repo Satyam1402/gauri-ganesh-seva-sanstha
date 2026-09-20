@@ -5,32 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('app.name'))</title>
-    <meta name="description" content="@yield('meta_description', 'Gauri Ganesh Seva Sanstha — food, education, medical, and social welfare seva.')">
-    @hasSection('meta_keywords')
-        <meta name="keywords" content="@yield('meta_keywords')">
-    @endif
-    <link rel="canonical" href="@yield('canonical_url', url()->current())">
+    @php
+        // Every public view receives $seo (App\Support\Seo\SeoData) from its
+        // controller via SeoService; anything rendered without one gets the
+        // site-wide defaults. Branding values come from the cached settings map.
+        $seo ??= app(App\Services\SeoService::class)->defaults();
+        $favicon = setting_media('branding.favicon');
+        $primaryColor = setting('branding.primary_color');
+        $accentColor = setting('branding.secondary_color');
+    @endphp
 
-    <meta property="og:title" content="@yield('og_title', config('app.name'))">
-    <meta property="og:description" content="@yield('og_description', 'Together, we restore dignity.')">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    @hasSection('og_image')
-        <meta property="og:image" content="@yield('og_image')">
-    @endif
+    @include('partials.frontend.seo-head', ['seo' => $seo])
 
-    <meta name="twitter:card" content="@yield('twitter_card', 'summary_large_image')">
-    <meta name="twitter:title" content="@yield('og_title', config('app.name'))">
-    <meta name="twitter:description" content="@yield('og_description', 'Together, we restore dignity.')">
-    @hasSection('og_image')
-        <meta name="twitter:image" content="@yield('og_image')">
+    @if ($favicon)
+        <link rel="icon" href="{{ $favicon }}">
     @endif
-
-    @stack('structured_data')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if ($primaryColor || $accentColor)
+        {{-- Brand colour overrides: values are validated as #RRGGBB before they are stored. --}}
+        <style>:root{ {{ $primaryColor ? '--color-primary-700:'.$primaryColor.';' : '' }}{{ $accentColor ? '--color-accent-500:'.$accentColor.';' : '' }} }</style>
+    @endif
     @stack('styles')
+    @include('partials.frontend.analytics')
 </head>
 <body class="flex min-h-screen flex-col bg-bg-base text-text-900">
 

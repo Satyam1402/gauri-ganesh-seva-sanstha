@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\HasSeoRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreActivityCategoryRequest extends FormRequest
 {
+    use HasSeoRules;
+
     public function authorize(): bool
     {
         return true;
@@ -21,6 +24,7 @@ class StoreActivityCategoryRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:120', 'unique:activity_categories,slug'],
             'description' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
+            ...$this->seoRules(),
         ];
     }
 }

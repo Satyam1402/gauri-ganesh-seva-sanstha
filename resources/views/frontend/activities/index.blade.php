@@ -1,25 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Our Activities — '.config('app.name'))
-@section('meta_description', 'Explore food distributions, medical camps, education support, and other community programs run by '.config('app.name').'.')
-@section('canonical_url', url('/activities'))
-@section('og_title', 'Our Activities — '.config('app.name'))
-@section('og_description', 'Explore the community programs and outreach activities run by '.config('app.name').'.')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@@context' => 'https://schema.org',
-            '@type' => 'CollectionPage',
-            'name' => 'Our Activities — '.config('app.name'),
-            'url' => url('/activities'),
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
-
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[['label' => 'Home', 'url' => route('home')], ['label' => 'Activities']]" class="mb-4" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-4" />
 
         <x-ui.section-heading heading="Our Activities" subheading="Real programs, real impact — see what we've been doing in the community." />
     </x-ui.section>
@@ -104,6 +87,10 @@
             </div>
         @endif
     </x-ui.section>
+
+    <x-partners-section heading="Partners on the Ground" subheading="The organisations that help us run every drive and camp." :featured="true" :limit="8" background="muted" />
+
+    <x-faq-section heading="Questions About Our Activities" category="activities" :limit="5" background="white" />
 
     <x-ui.section background="white">
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">

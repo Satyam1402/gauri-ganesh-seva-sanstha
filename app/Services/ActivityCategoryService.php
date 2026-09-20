@@ -10,7 +10,10 @@ use Illuminate\Validation\ValidationException;
 
 class ActivityCategoryService
 {
-    public function __construct(private ActivityCategoryRepositoryInterface $categories) {}
+    public function __construct(
+        private ActivityCategoryRepositoryInterface $categories,
+        private SeoService $seoService,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data
@@ -24,6 +27,7 @@ class ActivityCategoryService
             'is_active' => (bool) ($data['is_active'] ?? true),
         ]);
 
+        $this->seoService->sync($category, $data + ['schema_type' => 'CollectionPage']);
         $this->forgetCache();
 
         return $category;
@@ -41,6 +45,7 @@ class ActivityCategoryService
             'is_active' => (bool) ($data['is_active'] ?? false),
         ]);
 
+        $this->seoService->sync($category, $data + ['schema_type' => 'CollectionPage']);
         $this->forgetCache();
 
         return $category->refresh();

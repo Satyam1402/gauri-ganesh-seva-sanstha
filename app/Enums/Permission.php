@@ -17,6 +17,9 @@ enum Permission: string
     case ManageReports = 'manage reports';
     case ManageSettings = 'manage settings';
     case ManageContactMessages = 'manage contact messages';
+    case ManageTestimonials = 'manage testimonials';
+    case ManageFaqs = 'manage faqs';
+    case ManagePartners = 'manage partners';
 
     /**
      * @return list<string>

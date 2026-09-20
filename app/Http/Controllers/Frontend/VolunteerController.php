@@ -7,10 +7,8 @@ use App\Enums\Gender;
 use App\Enums\VolunteerAvailability;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Frontend\StoreVolunteerApplicationRequest;
-use App\Models\Page;
 use App\Services\VolunteerApplicationService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class VolunteerController extends Controller
@@ -24,14 +22,13 @@ class VolunteerController extends Controller
      */
     public function create(): View
     {
-        $page = Cache::rememberForever('pages.volunteer', fn () => Page::query()
-            ->where('slug', 'volunteer')
-            ->with(['seo.ogImage', 'media'])
-            ->first()
-        );
-
         return view('frontend.volunteers.create', [
-            'page' => $page,
+            'seo' => $this->seo()->forPage('volunteer', [
+                'title' => 'Become a Volunteer',
+                'description' => 'Join '.setting('general.site_name').' as a volunteer — help with food distribution, education, medical camps and community outreach. Apply online in minutes.',
+                'canonical' => route('volunteer.create'),
+                'breadcrumbs' => [['label' => 'Home', 'url' => route('home')], ['label' => 'Become a Volunteer']],
+            ]),
             'genders' => Gender::options(),
             'availabilities' => VolunteerAvailability::options(),
             'communicationMethods' => CommunicationMethod::options(),
@@ -59,6 +56,7 @@ class VolunteerController extends Controller
         }
 
         return view('frontend.volunteers.thank-you', [
+            'seo' => $this->seo()->make(['title' => 'Application Received', 'robots' => 'noindex, nofollow', 'canonical' => route('volunteer.create')]),
             'reference' => session('volunteer_reference'),
             'firstName' => session('volunteer_first_name'),
         ]);

@@ -97,6 +97,11 @@
             <path stroke-linecap="round" d="M8 11v5M8 8.2v.05M12 16v-3a2 2 0 0 1 4 0v3" />
             @break
 
+        @case('telegram')
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.5 4.5 3.8 11a.6.6 0 0 0 .05 1.13l4.3 1.4 1.65 5.1a.6.6 0 0 0 1 .25l2.4-2.3 4.4 3.25a.6.6 0 0 0 .95-.37l2.7-14.2a.6.6 0 0 0-.75-.76Z" />
+            <path stroke-linecap="round" d="m8.15 13.55 8.6-6.05-6.5 7.3" />
+            @break
+
         @case('phone')
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 4.5h3l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5C10.2 19.9 4.1 13.8 3.5 6.1A1.5 1.5 0 0 1 5 4.5Z" />
             @break

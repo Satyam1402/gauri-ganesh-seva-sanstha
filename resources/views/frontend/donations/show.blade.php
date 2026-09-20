@@ -1,51 +1,10 @@
 @extends('layouts.app')
 
-@php
-    $seo = $campaign->seo;
-    $shareUrl = route('donations.campaigns.show', $campaign);
-    $metaDescription = $seo?->meta_description ?? $campaign->short_description;
-@endphp
-
-@section('title', $seo?->meta_title ?? $campaign->name.' — '.config('app.name'))
-@section('meta_description', $metaDescription)
-@if ($seo?->meta_keywords)
-    @section('meta_keywords', $seo->meta_keywords)
-@endif
-@section('canonical_url', $seo?->canonical_url ?? $shareUrl)
-@section('og_title', $seo?->og_title ?? $campaign->name)
-@section('og_description', $seo?->og_description ?? $metaDescription)
-@if ($seo?->ogImage ?? $campaign->getFirstMedia('featured_image'))
-    @section('og_image', ($seo?->ogImage ?? $campaign->getFirstMedia('featured_image'))->getUrl())
-@endif
-@section('twitter_card', $seo?->twitter_card ?? 'summary_large_image')
-
-@push('structured_data')
-    <script type="application/ld+json">
-        {!! json_encode(array_filter([
-            '@@context' => 'https://schema.org',
-            '@type' => 'DonateAction',
-            'name' => $campaign->name,
-            'description' => $metaDescription,
-            'image' => $campaign->getFirstMedia('featured_image')?->getUrl(),
-            'recipient' => [
-                '@type' => 'NGO',
-                'name' => config('app.name'),
-            ],
-            'target' => [
-                '@type' => 'EntryPoint',
-                'urlTemplate' => route('donations.donate', $campaign),
-            ],
-        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush
+@php $shareUrl = route('donations.campaigns.show', $campaign); @endphp
 
 @section('content')
     <x-ui.section background="white" spacing="sm">
-        <x-ui.breadcrumbs :items="[
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Campaigns', 'url' => route('donations.campaigns.index')],
-            ['label' => $campaign->name],
-        ]" class="mb-6" />
+        <x-ui.breadcrumbs :items="$seo->breadcrumbItems()" class="mb-6" />
 
         <div class="h-72 w-full overflow-hidden rounded-xl sm:h-96">
             <x-ui.lazy-image :media="$campaign->getFirstMedia('featured_image')" :alt="$campaign->name" conversion="webp" />
@@ -130,6 +89,8 @@
             </aside>
         </div>
     </x-ui.section>
+
+    <x-testimonials-section heading="Why People Give" :for="$campaign" type="donor" :limit="3" background="white" />
 
     @if ($others->isNotEmpty())
         <x-ui.section background="muted">

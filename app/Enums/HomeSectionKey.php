@@ -67,7 +67,7 @@ enum HomeSectionKey: string
         return match ($this) {
             self::OurActivities, self::WhyChooseUs, self::ImpactStatistics,
             self::FeaturedCampaigns, self::UpcomingEvents, self::LatestNews,
-            self::Testimonials, self::Partners, self::GalleryPreview, self::FaqPreview => true,
+            self::GalleryPreview => true,
             default => false,
         };
     }

@@ -213,16 +213,6 @@ class HomeSectionsSeeder extends Seeder
                 ['title' => 'Behind the Scenes of Our Medical Camps', 'subtitle' => 'Impact Stories', 'description' => 'Meet the volunteers and doctors making free checkups possible.', 'link_url' => '/blog'],
                 ['title' => "2025's Winter Drive: By the Numbers", 'subtitle' => 'Announcements', 'description' => 'A recap of last winter\'s clothing distribution drive.', 'link_url' => '/blog'],
             ],
-            HomeSectionKey::Testimonials => [
-                ['title' => 'Anita Sharma', 'subtitle' => 'Donor', 'description' => 'Seeing the impact update after my donation made all the difference.'],
-                ['title' => 'Rohit Deshmukh', 'subtitle' => 'Volunteer', 'description' => 'Volunteering here showed me what real, consistent seva looks like.'],
-                ['title' => 'Sunita Jadhav', 'subtitle' => 'Beneficiary', 'description' => 'The medical camp gave my family care we could not have afforded otherwise.'],
-            ],
-            HomeSectionKey::Partners => [
-                ['title' => 'ABC Foundation', 'link_url' => '#'],
-                ['title' => 'Sunrise CSR Trust', 'link_url' => '#'],
-                ['title' => 'Community Health Partners', 'link_url' => '#'],
-            ],
             HomeSectionKey::GalleryPreview => [
                 ['title' => 'Food distribution drive, Pune'],
                 ['title' => 'Free medical checkup camp'],
@@ -230,12 +220,6 @@ class HomeSectionsSeeder extends Seeder
                 ['title' => 'School kits handover'],
                 ['title' => 'Volunteer orientation day'],
                 ['title' => 'Community welfare visit'],
-            ],
-            HomeSectionKey::FaqPreview => [
-                ['title' => 'Is my donation tax-deductible?', 'description' => 'Yes, all donations are eligible for tax benefits under Section 80G.'],
-                ['title' => 'How do I know my donation is used well?', 'description' => 'We publish transparent fund-usage reports and impact updates to every donor.'],
-                ['title' => 'Can I volunteer without a long-term commitment?', 'description' => 'Yes — one-time and occasional volunteering opportunities are available.'],
-                ['title' => 'How can I request help for my family?', 'description' => 'Use the Request Help form on our Contact page — all requests are kept confidential.'],
             ],
             default => [],
         };

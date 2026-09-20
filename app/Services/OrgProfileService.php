@@ -51,6 +51,7 @@ class OrgProfileService
         $this->removeMedia($profile, $data['remove_document_ids'] ?? [], 'legal_documents');
 
         Cache::forget(self::CACHE_KEY);
+        Cache::forget(SettingsService::CACHE_KEY);
 
         return $profile->refresh();
     }
