@@ -3,12 +3,12 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\Role as RoleEnum;
-use App\Mail\EnquiryReplyMail;
 use App\Models\ContactEnquiry;
 use App\Models\User;
+use App\Notifications\Contact\EnquiryReply;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class ContactEnquiryManagementTest extends TestCase
@@ -92,7 +92,7 @@ class ContactEnquiryManagementTest extends TestCase
 
     public function test_replying_stores_the_reply_and_queues_the_email(): void
     {
-        Mail::fake();
+        Notification::fake();
         $enquiry = $this->enquiry();
         $admin = $this->admin();
 
@@ -107,12 +107,12 @@ class ContactEnquiryManagementTest extends TestCase
         $this->assertSame('in_progress', $enquiry->status->value);
         $this->assertNotNull($enquiry->replied_at);
 
-        Mail::assertQueued(EnquiryReplyMail::class, fn ($mail) => $mail->hasTo($enquiry->email));
+        Notification::assertSentTo($enquiry, EnquiryReply::class);
     }
 
     public function test_replying_does_not_downgrade_a_resolved_status(): void
     {
-        Mail::fake();
+        Notification::fake();
         $enquiry = $this->enquiry(['status' => 'resolved']);
 
         $this->actingAs($this->admin())->post(route('admin.contact-enquiries.reply', $enquiry), [

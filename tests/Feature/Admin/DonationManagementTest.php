@@ -3,14 +3,13 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\Role as RoleEnum;
-use App\Mail\DonationReceiptMail;
-use App\Mail\DonationThankYouMail;
 use App\Models\Donation;
 use App\Models\DonationCampaign;
 use App\Models\User;
+use App\Notifications\Donations\DonationConfirmation;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class DonationManagementTest extends TestCase
@@ -67,7 +66,7 @@ class DonationManagementTest extends TestCase
 
     public function test_admin_can_record_a_completed_donation_with_receipt_and_campaign_totals(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $campaign = $this->campaign();
 
@@ -93,13 +92,12 @@ class DonationManagementTest extends TestCase
         $this->assertStringContainsString('GGSS-', $donation->receipt_number);
         $this->assertSame(5100.0, (float) $campaign->fresh()->raised_amount);
 
-        Mail::assertQueued(DonationReceiptMail::class, fn ($mail) => $mail->hasTo('anita@example.com'));
-        Mail::assertQueued(DonationThankYouMail::class, fn ($mail) => $mail->hasTo('anita@example.com'));
+        Notification::assertSentTo($donation, DonationConfirmation::class);
     }
 
     public function test_verifying_a_pending_donation_completes_it_and_sends_the_receipt(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $campaign = $this->campaign();
         $donation = $this->pendingDonation($campaign);
@@ -114,7 +112,7 @@ class DonationManagementTest extends TestCase
         $this->assertNotNull($donation->receipt_number);
         $this->assertSame(2100.0, (float) $campaign->fresh()->raised_amount);
 
-        Mail::assertQueued(DonationReceiptMail::class);
+        Notification::assertSentTo($donation, DonationConfirmation::class);
     }
 
     public function test_marking_a_donation_failed_does_not_touch_campaign_totals(): void
@@ -132,7 +130,7 @@ class DonationManagementTest extends TestCase
 
     public function test_refunding_a_completed_donation_reduces_campaign_totals(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $campaign = $this->campaign();
         $donation = $this->pendingDonation($campaign);
@@ -158,7 +156,7 @@ class DonationManagementTest extends TestCase
 
     public function test_donations_can_be_exported_as_csv(): void
     {
-        Mail::fake();
+        Notification::fake();
         $this->pendingDonation($this->campaign());
 
         $response = $this->actingAs($this->admin())->get(route('admin.donations.export'));
@@ -173,7 +171,7 @@ class DonationManagementTest extends TestCase
 
     public function test_donations_can_be_exported_as_xlsx(): void
     {
-        Mail::fake();
+        Notification::fake();
         $this->pendingDonation($this->campaign());
 
         $response = $this->actingAs($this->admin())->get(route('admin.donations.export', ['format' => 'xlsx']));
@@ -191,7 +189,7 @@ class DonationManagementTest extends TestCase
 
     public function test_donation_report_shows_aggregates_without_donor_details(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $campaign = $this->campaign();
         $donation = $this->pendingDonation($campaign);

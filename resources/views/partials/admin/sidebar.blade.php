@@ -20,6 +20,7 @@
         <div>
             <p class="px-2 text-xs font-semibold uppercase tracking-wide text-text-400 dark:text-night-text-muted">Overview</p>
             <a href="{{ route('admin.dashboard') }}" class="{{ $navLink('admin.dashboard', 'admin.dashboard') }}">Dashboard</a>
+            <a href="{{ route('admin.notifications.index') }}" class="{{ $navLink('admin.notifications.index', 'admin.notifications.*') }}">Notifications</a>
             @can('view-any-reports')
                 <a href="{{ route('admin.reports.index') }}" class="{{ $navLink('admin.reports.index', 'admin.reports.*') }}">Reports</a>
             @endcan
@@ -90,6 +91,9 @@
                 <a href="{{ route('admin.settings.edit', 'general') }}" class="{{ $navLink('admin.settings.edit', 'admin.settings.*') }}">Settings</a>
                 <a href="{{ route('admin.menu-items.index') }}" class="{{ $navLink('admin.menu-items.index', 'admin.menu-items.*') }}">Navigation</a>
                 <a href="{{ route('admin.seo.index') }}" class="{{ $navLink('admin.seo.index', 'admin.seo.*') }}">SEO</a>
+            @endcan
+            @can('viewAny', App\Models\Backup::class)
+                <a href="{{ route('admin.backups.index') }}" class="{{ $navLink('admin.backups.index', 'admin.backups.*') }}">Backups</a>
             @endcan
             @can('viewAny', App\Models\User::class)
                 <a href="{{ route('admin.users.index') }}" class="{{ $navLink('admin.users.index', 'admin.users.*') }}">Users</a>

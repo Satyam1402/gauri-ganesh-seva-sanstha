@@ -47,6 +47,33 @@ return [
             'report' => false,
         ],
 
+        // Backup archives. Private, never symlinked into public/, never
+        // served — downloads go through the authorised admin route only.
+        'backups' => [
+            'driver' => 'local',
+            'root' => storage_path('app/backups'),
+            'visibility' => 'private',
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Optional off-site copy of the backups (S3 or any S3-compatible
+        // store such as MinIO/Backblaze/DigitalOcean Spaces). Only used when
+        // BACKUP_S3_ENABLED=true; credentials always come from the environment.
+        'backups_s3' => [
+            'driver' => 's3',
+            'key' => env('BACKUP_S3_KEY'),
+            'secret' => env('BACKUP_S3_SECRET'),
+            'region' => env('BACKUP_S3_REGION', 'ap-south-1'),
+            'bucket' => env('BACKUP_S3_BUCKET'),
+            'endpoint' => env('BACKUP_S3_ENDPOINT'),
+            'use_path_style_endpoint' => env('BACKUP_S3_USE_PATH_STYLE_ENDPOINT', false),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

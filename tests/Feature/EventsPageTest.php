@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Mail\EventRegistrationConfirmationMail;
-use App\Mail\NewEventRegistrationNotificationMail;
 use App\Models\Event;
 use App\Models\EventCategory;
+use App\Notifications\Events\EventRegistrationConfirmation;
+use App\Notifications\Events\NewEventRegistrationAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class EventsPageTest extends TestCase
@@ -86,7 +86,7 @@ class EventsPageTest extends TestCase
 
     public function test_a_visitor_can_register_for_an_open_event_and_emails_are_queued(): void
     {
-        Mail::fake();
+        Notification::fake();
         config(['events.admin_notification_email' => 'admin@example.com']);
 
         $event = $this->event(['requires_registration' => true, 'max_participants' => 50]);
@@ -106,13 +106,13 @@ class EventsPageTest extends TestCase
         $this->assertSame('Asha Patil', $registration->name);
         $this->assertSame('pending', $registration->status->value);
 
-        Mail::assertQueued(EventRegistrationConfirmationMail::class, fn ($mail) => $mail->hasTo('asha@example.com'));
-        Mail::assertQueued(NewEventRegistrationNotificationMail::class, fn ($mail) => $mail->hasTo('admin@example.com'));
+        Notification::assertSentTo($registration, EventRegistrationConfirmation::class);
+        Notification::assertSentOnDemand(NewEventRegistrationAlert::class, fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'admin@example.com');
     }
 
     public function test_the_same_email_cannot_register_twice_for_one_event(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $event = $this->event(['requires_registration' => true]);
         $event->registrations()->create([
@@ -130,12 +130,12 @@ class EventsPageTest extends TestCase
 
         $response->assertSessionHasErrors('email');
         $this->assertSame(1, $event->registrations()->count());
-        Mail::assertNothingQueued();
+        Notification::assertNothingSent();
     }
 
     public function test_registration_is_rejected_when_the_event_is_full(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $event = $this->event(['requires_registration' => true, 'max_participants' => 1]);
         $event->registrations()->create([
@@ -153,12 +153,12 @@ class EventsPageTest extends TestCase
 
         $response->assertSessionHasErrors('registration');
         $this->assertSame(1, $event->registrations()->count());
-        Mail::assertNothingQueued();
+        Notification::assertNothingSent();
     }
 
     public function test_registration_is_rejected_when_the_event_does_not_require_it(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $event = $this->event(['requires_registration' => false]);
 
@@ -174,7 +174,7 @@ class EventsPageTest extends TestCase
 
     public function test_registration_is_rejected_for_a_past_event(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $event = $this->event([
             'requires_registration' => true,
@@ -193,7 +193,7 @@ class EventsPageTest extends TestCase
 
     public function test_a_cancelled_registration_frees_its_seat(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $event = $this->event(['requires_registration' => true, 'max_participants' => 1]);
         $event->registrations()->create([

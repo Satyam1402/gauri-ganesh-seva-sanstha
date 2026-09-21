@@ -4,12 +4,11 @@ namespace App\Services;
 
 use App\Enums\RegistrationStatus;
 use App\Interfaces\EventRegistrationRepositoryInterface;
-use App\Mail\EventRegistrationConfirmationMail;
-use App\Mail\NewEventRegistrationNotificationMail;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Notifications\Events\EventRegistrationConfirmation;
+use App\Notifications\Events\NewEventRegistrationAlert;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class EventRegistrationService
@@ -17,6 +16,7 @@ class EventRegistrationService
     public function __construct(
         private EventRegistrationRepositoryInterface $registrations,
         private EventService $eventService,
+        private NotificationService $notifier,
     ) {}
 
     /**
@@ -61,7 +61,9 @@ class EventRegistrationService
             ]);
         });
 
-        Mail::to($registration->email)->queue(new EventRegistrationConfirmationMail($registration));
+        $registration->setRelation('event', $event);
+
+        $this->notifier->send($registration, new EventRegistrationConfirmation($registration));
         $this->notifyAdmin($registration);
 
         $this->eventService->forgetCache();
@@ -94,10 +96,9 @@ class EventRegistrationService
 
     private function notifyAdmin(EventRegistration $registration): void
     {
-        $recipient = config('events.admin_notification_email');
-
-        if ($recipient) {
-            Mail::to($recipient)->queue(new NewEventRegistrationNotificationMail($registration));
-        }
+        $this->notifier->notifyAdmins(
+            new NewEventRegistrationAlert($registration),
+            config('events.admin_notification_email'),
+        );
     }
 }

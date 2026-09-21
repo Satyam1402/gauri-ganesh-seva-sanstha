@@ -34,6 +34,7 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::ManageTestimonials,
             PermissionEnum::ManageFaqs,
             PermissionEnum::ManagePartners,
+            PermissionEnum::ManageBackups,
         ],
         RoleEnum::ContentManager->value => [
             PermissionEnum::ManageHomepage,

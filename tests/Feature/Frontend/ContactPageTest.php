@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Frontend;
 
-use App\Mail\EnquiryAcknowledgementMail;
-use App\Mail\NewEnquiryNotificationMail;
 use App\Models\ContactEnquiry;
+use App\Notifications\Contact\EnquiryAcknowledgement;
+use App\Notifications\Contact\NewEnquiryAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -43,7 +43,8 @@ class ContactPageTest extends TestCase
 
     public function test_a_valid_enquiry_is_stored_and_emails_are_queued(): void
     {
-        Mail::fake();
+        Notification::fake();
+        config(['contact.admin_notification_email' => 'hello@example.com']);
 
         $response = $this->post(route('contact.store'), $this->validPayload());
 
@@ -58,13 +59,13 @@ class ContactPageTest extends TestCase
         $this->assertNotNull($enquiry->consented_at);
         $this->assertNotNull($enquiry->ip_address);
 
-        Mail::assertQueued(EnquiryAcknowledgementMail::class, fn ($mail) => $mail->hasTo('asha@example.com'));
-        Mail::assertQueued(NewEnquiryNotificationMail::class);
+        Notification::assertSentTo(ContactEnquiry::firstOrFail(), EnquiryAcknowledgement::class);
+        Notification::assertSentOnDemand(NewEnquiryAlert::class);
     }
 
     public function test_the_honeypot_silently_discards_bot_submissions(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $response = $this->post(route('contact.store'), $this->validPayload([
             'website' => 'https://spam.example.com',
@@ -73,7 +74,7 @@ class ContactPageTest extends TestCase
         // Bots see a normal success redirect, but nothing is stored or sent.
         $response->assertRedirect(route('contact').'#contact-form');
         $this->assertSame(0, ContactEnquiry::count());
-        Mail::assertNothingQueued();
+        Notification::assertNothingSent();
     }
 
     public function test_consent_is_required(): void
@@ -93,7 +94,7 @@ class ContactPageTest extends TestCase
 
     public function test_an_attachment_is_stored_on_the_private_disk(): void
     {
-        Mail::fake();
+        Notification::fake();
         Storage::fake('public');
         Storage::fake('local');
 
@@ -118,7 +119,7 @@ class ContactPageTest extends TestCase
 
     public function test_recaptcha_is_skipped_when_not_configured(): void
     {
-        Mail::fake();
+        Notification::fake();
         config(['services.recaptcha.secret_key' => null]);
 
         $this->post(route('contact.store'), $this->validPayload())

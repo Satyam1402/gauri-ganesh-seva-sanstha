@@ -59,6 +59,14 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // spatie/db-dumper options for backups: consistent snapshot without
+            // table locks; DB_DUMP_BINARY_PATH points at the folder holding
+            // mysqldump (e.g. the XAMPP mysql/bin folder). Empty = use PATH.
+            'dump' => [
+                'dump_binary_path' => env('DB_DUMP_BINARY_PATH', ''),
+                'use_single_transaction',
+                'timeout' => 60 * 15,
+            ],
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
@@ -79,6 +87,14 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // spatie/db-dumper options for backups: consistent snapshot without
+            // table locks; DB_DUMP_BINARY_PATH points at the folder holding
+            // mysqldump (e.g. the XAMPP mysql/bin folder). Empty = use PATH.
+            'dump' => [
+                'dump_binary_path' => env('DB_DUMP_BINARY_PATH', ''),
+                'use_single_transaction',
+                'timeout' => 60 * 15,
+            ],
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],

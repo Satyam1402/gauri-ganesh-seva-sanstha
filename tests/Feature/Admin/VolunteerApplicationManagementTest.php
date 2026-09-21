@@ -3,13 +3,13 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\Role as RoleEnum;
-use App\Mail\VolunteerApplicationApprovedMail;
-use App\Mail\VolunteerApplicationRejectedMail;
+use App\Enums\VolunteerApplicationStatus;
 use App\Models\User;
 use App\Models\VolunteerApplication;
+use App\Notifications\Volunteers\VolunteerApplicationStatusUpdated;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class VolunteerApplicationManagementTest extends TestCase
@@ -89,7 +89,7 @@ class VolunteerApplicationManagementTest extends TestCase
 
     public function test_approving_stamps_the_reviewer_and_queues_the_approval_mail(): void
     {
-        Mail::fake();
+        Notification::fake();
         $application = $this->application();
         $admin = $this->admin();
 
@@ -102,12 +102,12 @@ class VolunteerApplicationManagementTest extends TestCase
         $this->assertSame($admin->id, $application->reviewed_by);
         $this->assertNotNull($application->reviewed_at);
 
-        Mail::assertQueued(VolunteerApplicationApprovedMail::class, fn ($mail) => $mail->hasTo($application->email));
+        Notification::assertSentTo($application, VolunteerApplicationStatusUpdated::class, fn ($notification) => $notification->application->status === VolunteerApplicationStatus::Approved);
     }
 
     public function test_rejecting_queues_the_rejection_mail(): void
     {
-        Mail::fake();
+        Notification::fake();
         $application = $this->application();
 
         $this->actingAs($this->admin())
@@ -115,12 +115,12 @@ class VolunteerApplicationManagementTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame('rejected', $application->refresh()->status->value);
-        Mail::assertQueued(VolunteerApplicationRejectedMail::class);
+        Notification::assertSentTo($application, VolunteerApplicationStatusUpdated::class, fn ($notification) => $notification->application->status === VolunteerApplicationStatus::Rejected);
     }
 
     public function test_saving_the_same_status_does_not_requeue_a_status_mail(): void
     {
-        Mail::fake();
+        Notification::fake();
         $application = $this->application(['status' => 'approved']);
 
         $this->actingAs($this->admin())->put(route('admin.volunteer-applications.update', $application), [
@@ -129,7 +129,7 @@ class VolunteerApplicationManagementTest extends TestCase
         ])->assertRedirect();
 
         $this->assertSame('Orientation scheduled.', $application->refresh()->admin_notes);
-        Mail::assertNotQueued(VolunteerApplicationApprovedMail::class);
+        Notification::assertNotSentTo($application, VolunteerApplicationStatusUpdated::class);
     }
 
     public function test_an_application_can_be_archived(): void
@@ -145,7 +145,7 @@ class VolunteerApplicationManagementTest extends TestCase
 
     public function test_applications_can_be_bulk_status_updated(): void
     {
-        Mail::fake();
+        Notification::fake();
         $first = $this->application();
         $second = $this->application();
 

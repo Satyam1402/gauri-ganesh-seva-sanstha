@@ -4,24 +4,23 @@ namespace App\Services;
 
 use App\Enums\VolunteerApplicationStatus;
 use App\Interfaces\VolunteerApplicationRepositoryInterface;
-use App\Mail\NewVolunteerApplicationNotificationMail;
-use App\Mail\VolunteerApplicationApprovedMail;
-use App\Mail\VolunteerApplicationReceivedMail;
-use App\Mail\VolunteerApplicationRejectedMail;
 use App\Models\VolunteerApplication;
+use App\Notifications\Volunteers\NewVolunteerApplicationAlert;
+use App\Notifications\Volunteers\VolunteerApplicationReceived;
+use App\Notifications\Volunteers\VolunteerApplicationStatusUpdated;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class VolunteerApplicationService
 {
     public function __construct(
         private VolunteerApplicationRepositoryInterface $applications,
+        private NotificationService $notifier,
     ) {}
 
     /**
      * Store a public application with its uploads, then queue the applicant
-     * confirmation and admin notification emails.
+     * confirmation and the admin alert.
      *
      * @param  array<string, mixed>  $data  Validated form data.
      */
@@ -44,7 +43,7 @@ class VolunteerApplicationService
             return $application;
         });
 
-        Mail::to($application->email)->queue(new VolunteerApplicationReceivedMail($application));
+        $this->notifier->send($application, new VolunteerApplicationReceived($application));
         $this->notifyAdmin($application);
 
         return $application;
@@ -140,23 +139,22 @@ class VolunteerApplicationService
         return $application;
     }
 
+    /**
+     * Approved / rejected / under review / on hold reach the applicant;
+     * archiving is an internal housekeeping state and stays silent.
+     */
     private function sendStatusMail(VolunteerApplication $application): void
     {
-        match ($application->status) {
-            VolunteerApplicationStatus::Approved => Mail::to($application->email)
-                ->queue(new VolunteerApplicationApprovedMail($application)),
-            VolunteerApplicationStatus::Rejected => Mail::to($application->email)
-                ->queue(new VolunteerApplicationRejectedMail($application)),
-            default => null,
-        };
+        if (in_array($application->status, VolunteerApplicationStatusUpdated::notifiableStatuses(), true)) {
+            $this->notifier->send($application, new VolunteerApplicationStatusUpdated($application));
+        }
     }
 
     private function notifyAdmin(VolunteerApplication $application): void
     {
-        $recipient = config('volunteers.admin_notification_email');
-
-        if ($recipient) {
-            Mail::to($recipient)->queue(new NewVolunteerApplicationNotificationMail($application));
-        }
+        $this->notifier->notifyAdmins(
+            new NewVolunteerApplicationAlert($application),
+            config('volunteers.admin_notification_email'),
+        );
     }
 }

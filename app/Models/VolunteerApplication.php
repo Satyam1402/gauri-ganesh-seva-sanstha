@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -17,7 +18,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class VolunteerApplication extends Model implements HasMedia
 {
-    use InteractsWithMedia, SoftDeletes;
+    use InteractsWithMedia, Notifiable, SoftDeletes;
 
     /**
      * Media collections holding sensitive applicant documents. They live on
@@ -89,6 +90,14 @@ class VolunteerApplication extends Model implements HasMedia
     public function scopeStatus(Builder $query, VolunteerApplicationStatus $status): Builder
     {
         return $query->where('status', $status->value);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function routeNotificationForMail(): array
+    {
+        return [$this->email => $this->fullName()];
     }
 
     public function fullName(): string

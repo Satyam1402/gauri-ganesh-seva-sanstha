@@ -4,25 +4,25 @@ namespace App\Services;
 
 use App\Enums\EnquiryStatus;
 use App\Interfaces\ContactEnquiryRepositoryInterface;
-use App\Mail\EnquiryAcknowledgementMail;
-use App\Mail\EnquiryReplyMail;
-use App\Mail\NewEnquiryNotificationMail;
 use App\Models\ContactEnquiry;
 use App\Models\ContactEnquiryReply;
 use App\Models\User;
+use App\Notifications\Contact\EnquiryAcknowledgement;
+use App\Notifications\Contact\EnquiryReply;
+use App\Notifications\Contact\NewEnquiryAlert;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class ContactEnquiryService
 {
     public function __construct(
         private ContactEnquiryRepositoryInterface $enquiries,
+        private NotificationService $notifier,
     ) {}
 
     /**
      * Store a public enquiry with its optional attachment, then queue the
-     * acknowledgement and admin notification emails.
+     * acknowledgement and the admin alert.
      *
      * @param  array<string, mixed>  $data  Validated form data (plus ip_address).
      */
@@ -43,7 +43,7 @@ class ContactEnquiryService
             return $enquiry;
         });
 
-        Mail::to($enquiry->email)->queue(new EnquiryAcknowledgementMail($enquiry));
+        $this->notifier->send($enquiry, new EnquiryAcknowledgement($enquiry));
         $this->notifyAdmin($enquiry);
 
         return $enquiry;
@@ -85,7 +85,7 @@ class ContactEnquiryService
             return $reply;
         });
 
-        Mail::to($enquiry->email)->queue(new EnquiryReplyMail($enquiry, $reply));
+        $this->notifier->send($enquiry, new EnquiryReply($enquiry, $reply));
 
         return $reply;
     }
@@ -130,10 +130,9 @@ class ContactEnquiryService
 
     private function notifyAdmin(ContactEnquiry $enquiry): void
     {
-        $recipient = config('contact.admin_notification_email');
-
-        if ($recipient) {
-            Mail::to($recipient)->queue(new NewEnquiryNotificationMail($enquiry));
-        }
+        $this->notifier->notifyAdmins(
+            new NewEnquiryAlert($enquiry),
+            config('contact.admin_notification_email'),
+        );
     }
 }

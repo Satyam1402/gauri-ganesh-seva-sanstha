@@ -31,30 +31,8 @@
             </svg>
         </button>
 
-        {{-- Notifications --}}
-        <div class="relative" x-data="{ open: false }">
-            <button
-                type="button"
-                @click="open = !open"
-                @click.outside="open = false"
-                class="relative rounded-md p-2 text-text-600 hover:bg-surface-muted dark:text-night-text-muted dark:hover:bg-night-surface-alt"
-                aria-label="Notifications"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.85 23.85 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                </svg>
-            </button>
-
-            <div
-                x-show="open"
-                x-cloak
-                x-transition
-                class="absolute right-0 z-40 mt-2 w-72 rounded-lg border border-border-subtle bg-surface-white p-4 text-sm shadow-lg dark:border-night-border dark:bg-night-surface"
-            >
-                <p class="font-semibold text-text-900 dark:text-night-text">Notifications</p>
-                <p class="mt-3 text-text-400 dark:text-night-text-muted">You're all caught up — no new notifications.</p>
-            </div>
-        </div>
+        {{-- Notifications — unread count and recent items come from the NotificationBell class component --}}
+        <x-admin.notification-bell />
 
         {{-- Profile dropdown --}}
         <div class="relative" x-data="{ open: false }">

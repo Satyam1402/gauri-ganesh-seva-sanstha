@@ -41,8 +41,9 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    // Where new-donation notifications are sent. Falls back to MAIL_FROM_ADDRESS.
-    'admin_notification_email' => env('DONATION_ADMIN_EMAIL', env('MAIL_FROM_ADDRESS')),
+    // Optional shared inbox copied on donation alerts, in addition to the
+    // admin users who hold "manage donations" (see config/notifications.php).
+    'admin_notification_email' => env('DONATION_ADMIN_EMAIL'),
 
     /*
     |--------------------------------------------------------------------------

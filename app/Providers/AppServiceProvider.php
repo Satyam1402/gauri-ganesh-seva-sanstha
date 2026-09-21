@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Contracts\BackupRestorer;
+use App\Contracts\BackupRunner;
 use App\Interfaces\AboutSectionRepositoryInterface;
 use App\Interfaces\ActivityCategoryRepositoryInterface;
 use App\Interfaces\ActivityRepositoryInterface;
+use App\Interfaces\BackupRepositoryInterface;
 use App\Interfaces\BlogCategoryRepositoryInterface;
 use App\Interfaces\BlogCommentRepositoryInterface;
 use App\Interfaces\BlogPostRepositoryInterface;
@@ -30,6 +33,7 @@ use App\Policies\RolePolicy;
 use App\Repositories\AboutSectionRepository;
 use App\Repositories\ActivityCategoryRepository;
 use App\Repositories\ActivityRepository;
+use App\Repositories\BackupRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogCommentRepository;
 use App\Repositories\BlogPostRepository;
@@ -50,6 +54,8 @@ use App\Repositories\PartnerTypeRepository;
 use App\Repositories\TestimonialRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\VolunteerApplicationRepository;
+use App\Support\Backups\MysqlBackupRestorer;
+use App\Support\Backups\SpatieBackupRunner;
 use App\Support\Reports\ReportAccess;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Gate;
@@ -86,6 +92,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PartnerTypeRepositoryInterface::class, PartnerTypeRepository::class);
         $this->app->bind(PartnerRepositoryInterface::class, PartnerRepository::class);
         $this->app->bind(MenuItemRepositoryInterface::class, MenuItemRepository::class);
+        $this->app->bind(BackupRepositoryInterface::class, BackupRepository::class);
+
+        // Backup execution/restoration are behind contracts so the test suite
+        // can swap in fakes — no mysqldump or destructive restore ever runs there.
+        $this->app->bind(BackupRunner::class, SpatieBackupRunner::class);
+        $this->app->bind(BackupRestorer::class, MysqlBackupRestorer::class);
     }
 
     /**

@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Frontend;
 
-use App\Mail\NewVolunteerApplicationNotificationMail;
-use App\Mail\VolunteerApplicationReceivedMail;
 use App\Models\VolunteerApplication;
+use App\Notifications\Volunteers\NewVolunteerApplicationAlert;
+use App\Notifications\Volunteers\VolunteerApplicationReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -55,7 +55,8 @@ class VolunteerPageTest extends TestCase
 
     public function test_a_valid_application_is_stored_and_emails_are_queued(): void
     {
-        Mail::fake();
+        Notification::fake();
+        config(['volunteers.admin_notification_email' => 'volunteers@example.com']);
 
         $response = $this->post(route('volunteer.store'), $this->validPayload());
 
@@ -68,8 +69,8 @@ class VolunteerPageTest extends TestCase
         $this->assertNotNull($application->reference);
         $this->assertNotNull($application->consented_at);
 
-        Mail::assertQueued(VolunteerApplicationReceivedMail::class, fn ($mail) => $mail->hasTo('asha@example.com'));
-        Mail::assertQueued(NewVolunteerApplicationNotificationMail::class);
+        Notification::assertSentTo(VolunteerApplication::firstOrFail(), VolunteerApplicationReceived::class);
+        Notification::assertSentOnDemand(NewVolunteerApplicationAlert::class);
     }
 
     public function test_the_thank_you_page_requires_a_fresh_submission(): void
@@ -106,7 +107,7 @@ class VolunteerPageTest extends TestCase
 
     public function test_a_duplicate_open_application_is_rejected(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $this->post(route('volunteer.store'), $this->validPayload());
 
@@ -120,7 +121,7 @@ class VolunteerPageTest extends TestCase
 
     public function test_a_rejected_applicant_can_apply_again(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $this->post(route('volunteer.store'), $this->validPayload());
         VolunteerApplication::query()->update(['status' => 'rejected']);
@@ -133,7 +134,7 @@ class VolunteerPageTest extends TestCase
 
     public function test_uploads_are_attached_to_their_media_collections(): void
     {
-        Mail::fake();
+        Notification::fake();
         Storage::fake('public');
         Storage::fake('local');
 

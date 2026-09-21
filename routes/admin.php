@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\ActivityCategoryController;
 use App\Http\Controllers\Admin\ActivityController;
+use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogCommentController;
 use App\Http\Controllers\Admin\BlogPostController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Admin\GalleryPhotoController;
 use App\Http\Controllers\Admin\GalleryVideoController;
 use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\OrgProfileController;
 use App\Http\Controllers\Admin\PageSeoController;
 use App\Http\Controllers\Admin\PartnerController;
@@ -48,6 +50,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('profile/password', [PasswordController::class, 'update'])->name('password.update');
+
+    // Notification centre — rows are scoped to the signed-in user and to the
+    // categories their permissions allow (NotificationRepository + policy).
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('notifications/clear-read', [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
+    Route::get('notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open')->whereUuid('notification');
+    Route::patch('notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read')->whereUuid('notification');
+    Route::delete('notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy')->whereUuid('notification');
 
     Route::middleware('permission:manage users')->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
@@ -251,6 +262,25 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('menu-items/reorder', [MenuItemController::class, 'reorder'])->name('menu-items.reorder');
         Route::patch('menu-items/{menu_item}/toggle', [MenuItemController::class, 'toggle'])->name('menu-items.toggle');
         Route::resource('menu-items', MenuItemController::class)->except(['show']);
+    });
+
+    // Backups: archives live on a private disk and are only ever streamed
+    // through the authorised download route; manual runs and downloads are
+    // rate limited (config/backup.php "app").
+    Route::middleware('permission:manage backups')->group(function () {
+        Route::get('backups', [BackupController::class, 'index'])->name('backups.index');
+        Route::get('backups/logs', [BackupController::class, 'logs'])->name('backups.logs');
+        Route::post('backups', [BackupController::class, 'store'])->name('backups.store')
+            ->middleware('throttle:'.config('backup.app.run_rate_limit', '5,10'));
+        Route::post('backups/cleanup', [BackupController::class, 'cleanup'])->name('backups.cleanup');
+        Route::get('backups/{backup}/download', [BackupController::class, 'download'])->name('backups.download')
+            ->middleware('throttle:'.config('backup.app.download_rate_limit', '10,1'));
+        Route::post('backups/{backup}/retry', [BackupController::class, 'retry'])->name('backups.retry')
+            ->middleware('throttle:'.config('backup.app.run_rate_limit', '5,10'));
+        Route::get('backups/{backup}/restore', [BackupController::class, 'confirmRestore'])->name('backups.restore.confirm');
+        Route::post('backups/{backup}/restore', [BackupController::class, 'restore'])->name('backups.restore')
+            ->middleware('throttle:3,10');
+        Route::delete('backups/{backup}', [BackupController::class, 'destroy'])->name('backups.destroy');
     });
 
     Route::middleware('permission:manage gallery')->group(function () {

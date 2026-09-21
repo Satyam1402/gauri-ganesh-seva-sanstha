@@ -20,6 +20,7 @@ enum Permission: string
     case ManageTestimonials = 'manage testimonials';
     case ManageFaqs = 'manage faqs';
     case ManagePartners = 'manage partners';
+    case ManageBackups = 'manage backups';
 
     /**
      * @return list<string>

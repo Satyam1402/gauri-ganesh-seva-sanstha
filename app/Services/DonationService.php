@@ -5,23 +5,25 @@ namespace App\Services;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Interfaces\DonationRepositoryInterface;
-use App\Mail\DonationReceiptMail;
-use App\Mail\DonationThankYouMail;
-use App\Mail\NewDonationNotificationMail;
 use App\Models\Donation;
+use App\Notifications\Donations\DonationConfirmation;
+use App\Notifications\Donations\DonationFailed;
+use App\Notifications\Donations\NewDonationAlert;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class DonationService
 {
     public function __construct(
         private DonationRepositoryInterface $donations,
         private DonationCampaignService $campaignService,
+        private NotificationService $notifier,
     ) {}
 
     /**
-     * Create a pending donation from the public donate form and notify the
-     * admin team. Payment (online or offline) happens after this step.
+     * Create a pending donation from the public donate form. Payment
+     * (online or offline) happens after this step; admins are only alerted
+     * for offline methods, which now need manual verification — online
+     * attempts alert on completion instead, so abandoned checkouts stay quiet.
      *
      * @param  array<string, mixed>  $data
      */
@@ -44,7 +46,9 @@ class DonationService
             'remarks' => $data['remarks'] ?? null,
         ]);
 
-        $this->notifyAdmin($donation);
+        if ($donation->payment_method->isOffline()) {
+            $this->notifyAdmin($donation);
+        }
 
         return $donation;
     }
@@ -118,13 +122,18 @@ class DonationService
     }
 
     /**
-     * Move a donation to a new payment status, running the completion
-     * side-effects (receipt number, campaign totals, emails) when needed.
+     * Move a donation to a new payment status, running the completion or
+     * failure side-effects (receipt number, campaign totals, notifications)
+     * when needed.
      */
     public function transitionStatus(Donation $donation, PaymentStatus $status, bool $sendEmails = true): Donation
     {
         if ($status === PaymentStatus::Completed) {
             return $this->markCompleted($donation, $donation->transaction_id, $sendEmails);
+        }
+
+        if ($status === PaymentStatus::Failed) {
+            return $this->markFailed($donation, 'Marked as failed from the admin panel.', $sendEmails);
         }
 
         $donation->forceFill(['payment_status' => $status->value])->save();
@@ -134,8 +143,10 @@ class DonationService
     }
 
     /**
-     * Completion is the only transition with side-effects: assign the
-     * receipt number, update the campaign's raised total, email the donor.
+     * Completion is the transition with the most side-effects: assign the
+     * receipt number, update the campaign total, then notify the donor and
+     * the admin team. The record is committed before any notification is
+     * dispatched — a delivery problem can never undo a confirmed payment.
      */
     public function markCompleted(Donation $donation, ?string $transactionId = null, bool $sendEmails = true): Donation
     {
@@ -157,25 +168,36 @@ class DonationService
         });
 
         $this->refreshCampaignTotals($donation);
+        $donation->refresh();
 
         if ($sendEmails) {
-            Mail::to($donation->donor_email)->queue(new DonationReceiptMail($donation));
-            Mail::to($donation->donor_email)->queue(new DonationThankYouMail($donation));
-            $this->notifyAdmin($donation->refresh());
+            $this->notifier->send($donation, new DonationConfirmation($donation));
         }
 
-        return $donation->refresh();
+        $this->notifyAdmin($donation);
+
+        return $donation;
     }
 
-    public function markFailed(Donation $donation, ?string $reason = null): Donation
+    /**
+     * Record a confirmed failure (gateway callback, initiation error or an
+     * admin decision) and let the donor know so they can try again.
+     */
+    public function markFailed(Donation $donation, ?string $reason = null, bool $notifyDonor = true): Donation
     {
         if ($reason) {
             $donation->mergeMeta(['failure_reason' => $reason]);
         }
 
         $donation->forceFill(['payment_status' => PaymentStatus::Failed->value])->save();
+        $this->refreshCampaignTotals($donation);
+        $donation->refresh();
 
-        return $donation->refresh();
+        if ($notifyDonor) {
+            $this->notifier->send($donation, new DonationFailed($donation));
+        }
+
+        return $donation;
     }
 
     public function deleteDonation(Donation $donation): bool
@@ -217,11 +239,10 @@ class DonationService
 
     private function notifyAdmin(Donation $donation): void
     {
-        $recipient = config('donations.admin_notification_email');
-
-        if ($recipient) {
-            Mail::to($recipient)->queue(new NewDonationNotificationMail($donation));
-        }
+        $this->notifier->notifyAdmins(
+            new NewDonationAlert($donation->loadMissing('campaign')),
+            config('donations.admin_notification_email'),
+        );
     }
 
     /**

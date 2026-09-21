@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -16,7 +17,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ContactEnquiry extends Model implements HasMedia
 {
-    use InteractsWithMedia, SoftDeletes;
+    use InteractsWithMedia, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -53,6 +54,14 @@ class ContactEnquiry extends Model implements HasMedia
     /**
      * Staff member the enquiry is assigned to (future-ready workflow field).
      */
+    /**
+     * @return array<string, string>
+     */
+    public function routeNotificationForMail(): array
+    {
+        return [$this->email => $this->name];
+    }
+
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');

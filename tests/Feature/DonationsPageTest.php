@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Mail\NewDonationNotificationMail;
 use App\Models\Donation;
 use App\Models\DonationCampaign;
+use App\Notifications\Donations\NewDonationAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class DonationsPageTest extends TestCase
@@ -74,7 +74,8 @@ class DonationsPageTest extends TestCase
 
     public function test_submitting_the_donate_form_creates_a_pending_donation_and_redirects_to_payment(): void
     {
-        Mail::fake();
+        Notification::fake();
+        config(['donations.admin_notification_email' => 'donations@example.com']);
 
         $campaign = $this->campaign();
 
@@ -94,7 +95,7 @@ class DonationsPageTest extends TestCase
         $this->assertSame($campaign->id, $donation->donation_campaign_id);
         $this->assertNotNull($donation->reference);
 
-        Mail::assertQueued(NewDonationNotificationMail::class);
+        Notification::assertSentOnDemand(NewDonationAlert::class);
     }
 
     public function test_honeypot_field_blocks_bot_submissions(): void
@@ -112,7 +113,7 @@ class DonationsPageTest extends TestCase
 
     public function test_payment_page_shows_offline_instructions_for_bank_transfer(): void
     {
-        Mail::fake();
+        Notification::fake();
 
         $this->post(route('donations.store'), [
             'donor_name' => 'Ramesh Kulkarni',
@@ -132,7 +133,7 @@ class DonationsPageTest extends TestCase
 
     public function test_success_page_renders_for_a_donation(): void
     {
-        Mail::fake();
+        Notification::fake();
         $donation = Donation::create([
             'donor_name' => 'Meena Joshi',
             'donor_email' => 'meena@example.com',

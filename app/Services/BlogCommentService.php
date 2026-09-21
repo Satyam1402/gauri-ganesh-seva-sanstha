@@ -7,15 +7,20 @@ use App\Enums\PostStatus;
 use App\Interfaces\BlogCommentRepositoryInterface;
 use App\Models\BlogComment;
 use App\Models\BlogPost;
+use App\Notifications\Blog\CommentAwaitingModerationAlert;
 use Illuminate\Validation\ValidationException;
 
 class BlogCommentService
 {
-    public function __construct(private BlogCommentRepositoryInterface $comments) {}
+    public function __construct(
+        private BlogCommentRepositoryInterface $comments,
+        private NotificationService $notifier,
+    ) {}
 
     /**
      * Public comment submission — always lands as Pending so an admin
-     * approves it before it appears on the site.
+     * approves it before it appears on the site. Moderators get an in-app
+     * alert (no email — see CommentAwaitingModerationAlert).
      *
      * @param  array<string, mixed>  $data
      */
@@ -27,13 +32,20 @@ class BlogCommentService
             ]);
         }
 
-        return $post->comments()->create([
+        /** @var BlogComment $comment */
+        $comment = $post->comments()->create([
             'name' => $data['name'],
             'email' => $data['email'],
             'body' => $data['body'],
             'status' => CommentStatus::Pending->value,
             'ip_address' => $ipAddress,
         ]);
+
+        $comment->setRelation('post', $post);
+
+        $this->notifier->notifyAdmins(new CommentAwaitingModerationAlert($comment));
+
+        return $comment;
     }
 
     public function updateStatus(BlogComment $comment, string $status): BlogComment

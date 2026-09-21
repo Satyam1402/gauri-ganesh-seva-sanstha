@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
 class Donation extends Model
 {
-    use SoftDeletes;
+    use Notifiable, SoftDeletes;
 
     protected $fillable = [
         'donation_campaign_id',
@@ -52,6 +53,16 @@ class Donation extends Model
                 $donation->reference = (string) Str::uuid();
             }
         });
+    }
+
+    /**
+     * Donor emails are addressed to the donor on record.
+     *
+     * @return array<string, string>
+     */
+    public function routeNotificationForMail(): array
+    {
+        return [$this->donor_email => $this->donor_name];
     }
 
     public function campaign(): BelongsTo

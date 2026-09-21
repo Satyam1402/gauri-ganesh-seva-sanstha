@@ -8,12 +8,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Address that receives a notification email for every new volunteer
-    | application. Defaults to the general sender address when no
-    | dedicated inbox is configured.
+    | application, in addition to the admin users who hold "manage
+    | volunteers". Optional — leave empty to notify users only.
     |
     */
 
-    'admin_notification_email' => env('VOLUNTEER_ADMIN_EMAIL', env('MAIL_FROM_ADDRESS')),
+    'admin_notification_email' => env('VOLUNTEER_ADMIN_EMAIL'),
 
     /*
     |--------------------------------------------------------------------------
